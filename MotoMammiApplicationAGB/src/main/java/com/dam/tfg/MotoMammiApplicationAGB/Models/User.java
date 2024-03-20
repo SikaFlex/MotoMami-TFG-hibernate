@@ -1,4 +1,4 @@
-package com.dam.tfg.MotoMammiApplicationAGB;
+package com.dam.tfg.MotoMammiApplicationAGB.Models;
 
 import java.sql.Date;
 

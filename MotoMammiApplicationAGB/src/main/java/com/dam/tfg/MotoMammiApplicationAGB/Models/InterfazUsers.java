@@ -1,4 +1,4 @@
-package com.dam.tfg.MotoMammiApplicationAGB;
+package com.dam.tfg.MotoMammiApplicationAGB.Models;
 import org.hibernate.Session;
 
 import java.util.Date;

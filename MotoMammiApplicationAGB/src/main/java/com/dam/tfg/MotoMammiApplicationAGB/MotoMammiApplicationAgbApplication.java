@@ -6,52 +6,52 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 
 import java.util.*;
 
 @SpringBootApplication
+@EnableScheduling
 public class MotoMammiApplicationAgbApplication {
-
+	
 	public static void main(String[] args) {
-		Session session=null;
-		try{
-			session = getSession();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		}catch(Exception e){
-			System.err.println(e.getMessage());
-		}finally{
-			session.close();
-		}
+		SpringApplication.run(MotoMammiApplicationAgbApplication.class);
 	}
 
+	// public static void main(String[] args) {
+	// 	//Springboot initi soolo    esto es solo para probar ⬇️
+	// 	Session session=null;
+	// 	HibernateUtil hu = new HibernateUtil();
 
-	public static Session getSession(){
-		SessionFactory sessionFactory;
-		Configuration configuration = new Configuration();
-		configuration.configure("hibernate.cfg.xml");
-		// configuration.addAnnotatedClass(Covid_Register_User.class);
-		// configuration.addAnnotatedClass(Users_cide.class);
+	// 	try{
+	// 		session = hu.getSession();
 
-		StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-				.applySettings(configuration.getProperties()).build();
-		sessionFactory = configuration.buildSessionFactory(serviceRegistry);
 
-		return sessionFactory.openSession();
 
-	}
+
+
+
+
+
+
+
+
+
+
+
+	// 	}catch(Exception e){
+	// 		System.err.println(e.getMessage());
+	// 	}finally{
+	// 		session.close();
+	// 	}
+	// }
+
+
+	
+  
 
 }
