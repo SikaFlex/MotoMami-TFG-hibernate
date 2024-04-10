@@ -1,0 +1,8 @@
+
+//DB
+//credenciales, direccionIP... etc
+//rutas nombre archivos: vehiculo custommeer Part
+
+//customer lo leemos a la 1AM:
+//vehiculos lo leemos a las 2aM
+//Part lo leemos a las 3 am
