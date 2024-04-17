@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Services.ProccessService;
 import com.dam.tfg.MotoMammiApplicationAGB.Services.impl.ProccessServiceImpl;
+import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
 @Component
 public class ReadInfoFile {
@@ -26,18 +27,25 @@ public class ReadInfoFile {
   private static final Logger log = LoggerFactory.getLogger(ReadInfoFile.class);
 
 
-  private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-  @Autowired
-  private ProccessService p_service;
-
+  //LEER CADA DIA ARCHIVO DE CLIENTES
   @Scheduled(cron = "${cron.task.customer}")
-  // haz que se repita cada x tiempo automatico con el scheduled
-  public void readCurrentFile() {
-    
-
-    //ejecutar le ProcessServiceImplement
+  public void readCustomerFile() {
     ProccessServiceImpl process = new ProccessServiceImpl();
-    process.readInfoFile(customerPath, customerPath, customerPath);
+    process.readInfoFile(Constants.CUSTOMER, null,null);
+  }
+
+  //LEER CADA DIA ARCHIVO DE PARTES DE LOS CLIENTES
+  @Scheduled(cron = "${cron.task.parts}")
+  public void readPartFile() {
+    ProccessServiceImpl process = new ProccessServiceImpl();
+    process.readInfoFile(Constants.PARTS, null,null);
+  }
+
+//LEER CADA DIA ARCHIVO DE LOS VEHICULOS DE LOS CLIENTES
+  @Scheduled(cron = "${cron.task.vehicles}")
+  public void readVehiclesFile() {
+    ProccessServiceImpl process = new ProccessServiceImpl();
+    process.readInfoFile(Constants.VEHICLES, null,null);
   }
 
 

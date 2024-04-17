@@ -13,9 +13,8 @@ import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 
 @Repository
 public class ProviderRepository implements InterfazProvider{
-
     @Override
-    public void getAllUsersPovidersActive() {
+    public List<ProviderDTO> getAllUsersPovidersActive() {
     try {
         Session session=  HibernateUtil.getSession();
 
@@ -25,22 +24,13 @@ public class ProviderRepository implements InterfazProvider{
         .setParameter("p_prov", null)
         .setParameter("p_date", null)
         .list();
-        
-   
-        for (ProviderDTO providerDTO : listProviders) {
-            System.out.println(providerDTO.getName());
-        }
-        
+        session.close();
+        return listProviders;
     } catch (Exception e) {
        System.err.println("ERROR: "+e.getMessage());
     }
-      
+        return null;
     }
 
 
-    public static void main(String[] args) {
-        ProviderRepository pr = new ProviderRepository();
-        pr.getAllUsersPovidersActive();
-    }
-    
 }

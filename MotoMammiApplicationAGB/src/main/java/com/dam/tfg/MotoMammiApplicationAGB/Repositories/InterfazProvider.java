@@ -1,12 +1,11 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Repositories;
 
 import java.util.ArrayList;
-
+import java.util.List;
 import org.hibernate.Session;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
-import com.itextpdf.text.List;
 
 public interface InterfazProvider {
-    void getAllUsersPovidersActive();
+    List<ProviderDTO> getAllUsersPovidersActive();
 }
