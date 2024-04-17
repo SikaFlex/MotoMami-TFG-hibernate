@@ -3,15 +3,14 @@
 <hibernate-configuration>
     <session-factory>
         <property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="connection.url">jdbc:mysql://localhost/HIB_COVID19CIDE</property>
+        <property name="connection.url">jdbc:mysql://localhost/mm_agb</property>
         <property name="connection.username">root</property>
-        <property name="connection.password">root</property>
+        <property name="connection.password">696913</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
 
-        <!-- <mapping class="com.dam.U4EX01_CIDE_AGB.Covid_Register_User"/>
-        <mapping class="com.dam.U4EX01_CIDE_AGB.Users_cide"/> -->
-
+         <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderDTO"/>
+       <!-- <mapping class="com.dam.U4EX01_CIDE_AGB.Users_cide"/> -->
 
     </session-factory>
 </hibernate-configuration>

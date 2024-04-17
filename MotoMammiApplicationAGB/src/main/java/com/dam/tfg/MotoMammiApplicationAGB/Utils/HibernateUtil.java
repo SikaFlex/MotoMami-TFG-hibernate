@@ -6,13 +6,15 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
+import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
+
 public class HibernateUtil {
     
-    public Session getSession(){
+    public static Session getSession(){
 		SessionFactory sessionFactory;
 		Configuration configuration = new Configuration();
 		configuration.configure("hibernate.cfg.xml");
-		// configuration.addAnnotatedClass(Covid_Register_User.class);
+		configuration.addAnnotatedClass(ProviderDTO.class);
 		// configuration.addAnnotatedClass(Users_cide.class);
 
 		StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

@@ -2,9 +2,8 @@ package com.dam.tfg.MotoMammiApplicationAGB.Models;
 import jakarta.persistence.*;
 import java.sql.Date;
 
-
-@Entity
-@Table(name = "MM_PROVIDERS")
+@Entity(name="mm_providers")
+@Table
 public class ProviderDTO {
     @Id
     private String id;

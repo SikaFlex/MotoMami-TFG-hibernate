@@ -8,5 +8,5 @@ import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.itextpdf.text.List;
 
 public interface InterfazProvider {
-    ArrayList<ProviderDTO>getAllUsersPovidersActive(Session session);
+    void getAllUsersPovidersActive();
 }

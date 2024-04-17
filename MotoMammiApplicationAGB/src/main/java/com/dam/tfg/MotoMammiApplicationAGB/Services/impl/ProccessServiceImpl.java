@@ -7,6 +7,12 @@ import java.io.IOException;
 import java.nio.Buffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.hibernate.Hibernate;
+
+import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 
 //proceso que lee el fichero
 public class ProccessServiceImpl {
@@ -16,8 +22,14 @@ public class ProccessServiceImpl {
     //con los 3 parametros buscamos el archivo
      // [source]+[codProv]+[date]//dateNow
 
+
     public void readInfoFile(String source,String codProv, String date){
         try {
+
+
+        //validar que el proveedor existe
+     
+
         if (date==null){date=new SimpleDateFormat("yyyyMMdd").format(new Date());}
 
         String formatFile =".dat";

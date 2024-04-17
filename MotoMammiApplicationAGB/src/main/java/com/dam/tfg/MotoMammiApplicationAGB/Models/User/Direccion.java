@@ -1,4 +1,4 @@
-package com.dam.tfg.MotoMammiApplicationAGB.Models;
+package com.dam.tfg.MotoMammiApplicationAGB.Models.User;
 
 public class Direccion {
     String calle;
