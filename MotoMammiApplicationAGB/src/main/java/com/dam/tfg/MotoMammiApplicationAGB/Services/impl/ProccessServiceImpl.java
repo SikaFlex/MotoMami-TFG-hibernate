@@ -34,6 +34,8 @@ public class ProccessServiceImpl {
         //recuperamos los providers activos
         List<ProviderDTO> listaProveedoresActivos = PR.getAllUsersPovidersActive();
         
+
+        
         if (date==null){date=new SimpleDateFormat("yyyyMMdd").format(new Date());}
 
         String formatFile =".dat";

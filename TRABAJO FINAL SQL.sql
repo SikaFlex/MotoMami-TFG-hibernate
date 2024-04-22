@@ -34,6 +34,23 @@ cod_int varchar(250),
 FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(id)
 
 );
+
+-- CREATE TABLE CUSTOMERS
+	
+use mm_agb;
 -- Relacion  id de provider -> idProv
 
+Select * from MM_PROVIDERS;
 
+-- QUERY COMPROBAR PROVIDERS ACTIVOS
+select * from MM_PROVIDERS 
+where swiact = 1
+and ifnull(@param_date,current_date()) BETWEEN dateIni AND ifnull(dateEnd,'2099-12-31')
+and codigoProveedor = ifnull(@p_prov, codigoProveedor);
+
+select * from MM_PROVIDERS
+where swiact = 1 and ifnull(null,current_date()) BETWEEN dateIni AND ifnull(null,'2099-12-31') and codigoProveedor = ifnull(@p_prov, codigoProveedor)
+
+-- and codigoProveedor = @p_Prov and 
+
+[where swiact = 1 and ifnull(:p_date,current_date()) BETWEEN dateIni AND ifnull(dateEnd,'2099-12-31') and codigoProveedor = ifnull(:p_prov, codigoProveedor)]
