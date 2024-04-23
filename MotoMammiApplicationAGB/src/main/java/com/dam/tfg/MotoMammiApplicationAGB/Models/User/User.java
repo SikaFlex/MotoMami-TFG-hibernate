@@ -21,7 +21,7 @@ public class User{
     private String sexo;
     //una persona tiene muchos vehiculos pero un vehiculo no tiene muchas personas? 1-m? --> Vehiculos[]
     
-    private Vehiculo vehiculo;
+    private VehicleDTO vehiculo;
     private Direccion direccion;
     private Contacto contacto;
 

@@ -22,8 +22,7 @@ import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
 @Component
 public class ReadInfoFile {
-  @Value("${customer.path.file}")
-  String customerPath;
+
   private static final Logger log = LoggerFactory.getLogger(ReadInfoFile.class);
 
 
