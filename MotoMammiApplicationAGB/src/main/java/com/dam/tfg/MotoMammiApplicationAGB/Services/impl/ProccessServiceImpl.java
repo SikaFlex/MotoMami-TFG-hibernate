@@ -1,11 +1,13 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Services.impl;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,7 +18,8 @@ import org.aspectj.apache.bcel.classfile.Constant;
 import org.hibernate.Hibernate;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
-import com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderRepository;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.User.CustomerDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.User.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
@@ -53,22 +56,25 @@ public class ProccessServiceImpl {
        
             //en caso de que este vacio le pondra el dia de hoy
            String dateFile = date==null ? new SimpleDateFormat("yyyy-MM-dd").format(new Date())
-                                             :new SimpleDateFormat("yyyy-MM-dd").format(date);
+                                        :new SimpleDateFormat("yyyy-MM-dd").format(date);
                       
 
             ProviderRepository PR = new ProviderRepository();
 
             List<ProviderDTO> listaProveedoresActivos = PR.getAllUsersPovidersActive();
          
+            String vehicleFile;
+            String partFile;
+            String customerFile;
                 //recorremos los proveedores activos
             for (ProviderDTO proveedor : listaProveedoresActivos) {
                 // Recuperamos el código del proveedor
                 String codProvActivo = proveedor.getCodigoProveedor();
                 
-                //buscar archivo con este nombre
-                String vehicleFile= path + vehiclesPath + codProvActivo + dateFile + format;
-                String partFile= path + partsPath +  codProvActivo + dateFile + format;
-                String customerFile= path + customerPath + codProvActivo + dateFile + format;
+                //buscar archivo con estos nombres por cada proveedor
+                vehicleFile= path + vehiclesPath + codProvActivo + dateFile + format;
+                partFile= path + partsPath +  codProvActivo + dateFile + format;
+                customerFile= path + customerPath + codProvActivo + dateFile + format;
 
 
 
@@ -121,5 +127,71 @@ public class ProccessServiceImpl {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    private void readFile(String path, String constants){
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(new File(path)));
+            String linea;
+            while ((linea=br.readLine())!= null) {
+                if (linea.contains("DNI")/*|| linea.contains("ID_VEHICLE") || linea.contains("ID_PARTS") */) {linea=br.readLine();}//si contiene DNI Skipeala
+
+                switch (constants) {
+                    case "VEHICLES":
+                        ArrayList<VehicleDTO>vehiclesList = new ArrayList<>();
+                        //TODO: tratar archivo csv con los campos de customer    
+
+
+                        break;
+
+                    case "PART":
+                        
+                        break;
+
+                    case "CUS":
+                        ArrayList<CustomerDTO>customerList = new ArrayList<>();
+                        String[] cAtt =linea.split(",");//le pongo este nombre tan corto para que en el nuevo objeto no mida 3 campos de futbol
+                        customerList.add(new CustomerDTO(
+                        cAtt[0],cAtt[0],cAtt[0],cAtt[0],
+                        cAtt[0],cAtt[0],cAtt[0],cAtt[0],
+                        cAtt[0],cAtt[0],cAtt[0],cAtt[0],
+                        cAtt[0]));//13 campos jiji
+                        String dni = cAtt[0];
+                        if (!doValidatePersonIsInInterface(dni)) {
+                            //Si no existe 
+                            //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
+                            //
+                        }else{
+                            //En caso de si este OPERATION: "UPD"
+                            //compare con el que ya esta insertado en base de datos
+                            //en caso de que sea diferente hacemos un inster con update OPERATION= "UPD"
+                            //PREMOMINA EL JSON
+                        }
+
+                        }
+                        
+                        //Query en sql
+                        //CUSTOMER: DNI -- CODEXTERNAL 
+                        
+
+
+
+                        break;
+                    default:
+                        break;
+                }
+                
+            }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+    private boolean doValidatePersonIsInInterface(String dni) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'doValidatePersonIsInInterface'");
     }
 }

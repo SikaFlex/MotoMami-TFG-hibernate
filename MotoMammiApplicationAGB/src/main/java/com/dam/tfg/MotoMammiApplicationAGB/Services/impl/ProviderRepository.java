@@ -1,14 +1,17 @@
-package com.dam.tfg.MotoMammiApplicationAGB.Repositories;
+package com.dam.tfg.MotoMammiApplicationAGB.Services.impl;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.aspectj.apache.bcel.classfile.Module.Provide;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
+import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Repositories.InterfazProvider;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 
 @Repository
@@ -31,6 +34,25 @@ public class ProviderRepository implements InterfazProvider{
     }
         return null;
     }
+
+    public static boolean doValidatePersonIsInInterface(String dni){
+        try {
+            Session session=  HibernateUtil.getSession();
+
+            @SuppressWarnings("deprecation")
+            InterfazDTO provider = session.createQuery("FROM MM_INTERFACE where codExternal = :DNI",InterfazDTO.class)
+                                        .setParameter("DNI", dni)
+                                        .uniqueResult();
+            if (provider == null) {return false;}
+            return true;
+    //TODO: logica de que en caso de que 
+        } catch (Exception e) {
+            return false;
+            // TODO: handle exception
+        }
+
+    }
+
 
 
 }
