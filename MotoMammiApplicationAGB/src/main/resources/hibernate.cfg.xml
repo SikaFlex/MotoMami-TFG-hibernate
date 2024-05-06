@@ -9,7 +9,9 @@
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
 
 
-         <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderDTO"/>
+         <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO"/>
+         <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO."/>
+
        <!-- <mapping class="com.dam.U4EX01_CIDE_AGB.Users_cide"/> -->
 
     </session-factory>

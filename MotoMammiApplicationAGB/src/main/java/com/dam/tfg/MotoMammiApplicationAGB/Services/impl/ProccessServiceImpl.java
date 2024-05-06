@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.aspectj.apache.bcel.classfile.Constant;
 import org.hibernate.Hibernate;
 
+import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.User.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.User.VehicleDTO;
@@ -30,6 +31,7 @@ public class ProccessServiceImpl {
  
     @Value("${path.in}")
     String path;// /resources/in/
+
     @Value("${file.format.dat}")
     String format;//.dat
 
@@ -44,12 +46,13 @@ public class ProccessServiceImpl {
     
     //leer archivo
     //con los 3 parametros buscamos el archivo
-     // [source]+[codProv]+[date]
+    //[source]+[codProv]+[date]
 
     public static void main(String[] args) {
         
         ProccessServiceImpl psi = new ProccessServiceImpl();
         psi.readInfoFile("CUS",null,null);
+
     }
     public void readInfoFile(String source,String codProv, String date){
         try {
@@ -66,6 +69,7 @@ public class ProccessServiceImpl {
             String vehicleFile;
             String partFile;
             String customerFile;
+
                 //recorremos los proveedores activos
             for (ProviderDTO proveedor : listaProveedoresActivos) {
                 // Recuperamos el código del proveedor
@@ -75,45 +79,6 @@ public class ProccessServiceImpl {
                 vehicleFile= path + vehiclesPath + codProvActivo + dateFile + format;
                 partFile= path + partsPath +  codProvActivo + dateFile + format;
                 customerFile= path + customerPath + codProvActivo + dateFile + format;
-
-
-
-                // DEPENDIENDO EL SOURCE QUE LLEGUE EJECUTAREMOS UNA COSA U OTRA
-                switch (source) {
-                    case Constants.CUSTOMER:
-                    // customerFile leer recoger todos los datos del fichero DTO CustomerDTO
-                    //TODO: funcion para leer los archivos recibiendo por parametros el nombre del archivo y que depende lo que reciba usara un objeto u otro?
-                    //query
-                    //CUSTOMER: DNI -- CODEXTERNAL
-                        
-                        break;
-
-                    case Constants.PARTS:
-                    // partFile-> leer recoger todos los datos del fichero DTO PartsDTO
-
-                    //Query
-                    //PART: ID_PROVEEDOR -- CODEXTERNAL    
-
-                    break;
-
-
-                    case Constants.VEHICLES:
-                    //Query
-                    //VEHICLE: MATRICULA -- CODEXTERNAL
-                
-                    break;
-
-                    default:
-
-                        break;
-                }
-                //leemos los ficheros
-
-                //otra query a interface con el dni que recupere
-
-
-                //guardamos los datos de este ficher en la tabla MM_Interface
-
 
 
             }
@@ -128,7 +93,7 @@ public class ProccessServiceImpl {
             e.printStackTrace();
         }
     }
-    private void readFile(String path, String constants){
+    private void readFile(String path, String constants,String codprov ){
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(path)));
             String linea;
@@ -150,48 +115,56 @@ public class ProccessServiceImpl {
                     case "CUS":
                         ArrayList<CustomerDTO>customerList = new ArrayList<>();
                         String[] cAtt =linea.split(",");//le pongo este nombre tan corto para que en el nuevo objeto no mida 3 campos de futbol
-                        customerList.add(new CustomerDTO(
-                        cAtt[0],cAtt[0],cAtt[0],cAtt[0],
-                        cAtt[0],cAtt[0],cAtt[0],cAtt[0],
-                        cAtt[0],cAtt[0],cAtt[0],cAtt[0],
-                        cAtt[0]));//13 campos jiji
-                        String dni = cAtt[0];
-                        if (!doValidatePersonIsInInterface(dni)) {
+                        CustomerDTO customerDTO = new CustomerDTO(
+                            cAtt[0],cAtt[1],cAtt[2],cAtt[3],
+                            cAtt[4],cAtt[5],cAtt[6],cAtt[7],
+                            cAtt[8],cAtt[9],cAtt[10],cAtt[11],
+                            cAtt[12]);
+                        customerList.add(customerDTO);//13 campos jiji
+                        if (!doValidatePersonIsInInterface(customerDTO,codprov) {
                             //Si no existe 
                             //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
-                            //
-                        }else{
-                            //En caso de si este OPERATION: "UPD"
+                            
+
+                        }else if(!existJson(customerDTO)){//en caso de que no exista el mismo json lo ingreso en update
+
+
+                            //En caso de si este OPERATION: "UPD" Y SEA DIFERENTE EN CASO DE QUE SEA IGUAL NADA
                             //compare con el que ya esta insertado en base de datos
                             //en caso de que sea diferente hacemos un inster con update OPERATION= "UPD"
                             //PREMOMINA EL JSON
+
+                            
                         }
 
                         }
                         
                         //Query en sql
                         //CUSTOMER: DNI -- CODEXTERNAL 
-                        
-
-
 
                         break;
-                    default:
-                        break;
+              
                 }
                 
-            }
-
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
-    private boolean doValidatePersonIsInInterface(String dni) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'doValidatePersonIsInInterface'");
+
+    private boolean existJson (CustomerDTO customerDTO){
+
+        return false;
+
+    }
+
+    private boolean doValidatePersonIsInInterface(CustomerDTO customerDTO,String codProv) {
+        InterfazRepository IR = new InterfazRepository();
+        
+
+        InterfazDTO interfazDTO = IR.getPersonOfInterfazWithCustomer(customerDTO,codProv);
+        
+        return true;
     }
 }
