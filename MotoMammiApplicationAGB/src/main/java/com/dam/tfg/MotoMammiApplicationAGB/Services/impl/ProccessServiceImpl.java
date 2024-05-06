@@ -113,6 +113,7 @@ public class ProccessServiceImpl {
                         break;
 
                     case "CUS":
+                        InterfazRepository interfazRepository = null;
                         ArrayList<CustomerDTO>customerList = new ArrayList<>();
                         String[] cAtt =linea.split(",");//le pongo este nombre tan corto para que en el nuevo objeto no mida 3 campos de futbol
                         CustomerDTO customerDTO = new CustomerDTO(
@@ -121,13 +122,20 @@ public class ProccessServiceImpl {
                             cAtt[8],cAtt[9],cAtt[10],cAtt[11],
                             cAtt[12]);
                         customerList.add(customerDTO);//13 campos jiji
-                        if (!doValidatePersonIsInInterface(customerDTO,codprov) {
+                        String jsonToTheFile = ""; //esto deberia ser el JSON TODO: de donde saco este JSON y a que se refiere?
+                        if (!doValidatePersonIsInInterface(customerDTO,codprov)) {
+                            customerDTO.setOperatio(Constants.NEW); //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
+                            interfazRepository.insertCustomerToMMInterfaz(customerDTO); //procedemos a hacer el insert en base de datos
+
                             //Si no existe 
-                            //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
                             
 
-                        }else if(!existJson(customerDTO)){//en caso de que no exista el mismo json lo ingreso en update
+                        }else if(existJsonAndIsDiferent(customerDTO,jsonToTheFile)){//en caso de que no exista el mismo json lo ingreso en update
+                            //query a la tabla para ver si ya estuviese en  interfaz repository
+                            customerDTO.setOperatio(Constants.UPD);
+                            interfazRepository.insertCustomerToMMInterfaz(customerDTO);
 
+                            
 
                             //En caso de si este OPERATION: "UPD" Y SEA DIFERENTE EN CASO DE QUE SEA IGUAL NADA
                             //compare con el que ya esta insertado en base de datos
@@ -153,18 +161,22 @@ public class ProccessServiceImpl {
         }
     }
 
-    private boolean existJson (CustomerDTO customerDTO){
-
-        return false;
+    private boolean existJsonAndIsDiferent (CustomerDTO customerDTO, String jsonToTheFile){
+        InterfazRepository interfazRepository = null;
+        String jsonInterfaz = interfazRepository.haveJsonWithCustomer(customerDTO,jsonToTheFile);
+        return jsonInterfaz.isEmpty() ? false : true; 
+        //en caso de que sean iguales devolver un string vacio de ser asi se cumplira la condicion y sera false
+        //por lo tanto no entrara en el condicional y no hara nada 
 
     }
 
     private boolean doValidatePersonIsInInterface(CustomerDTO customerDTO,String codProv) {
         InterfazRepository IR = new InterfazRepository();
-        
-
         InterfazDTO interfazDTO = IR.getPersonOfInterfazWithCustomer(customerDTO,codProv);
-        
-        return true;
+        return interfazDTO == null ?  false : true ; 
+        //en caso de que sea null devolvera false y si encuentra algo no sera null entonce es true
+
     }
+
+
 }

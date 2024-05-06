@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS MM_Customer (
     number VARCHAR(20),
     phone VARCHAR(20),
     gender varchar(20),
-    licence_type VARCHAR(50)
+    licence_type VARCHAR(50),
+    operation VARCHAR(10)
 );
 -- PARTS
 CREATE TABLE MM_PARTS(

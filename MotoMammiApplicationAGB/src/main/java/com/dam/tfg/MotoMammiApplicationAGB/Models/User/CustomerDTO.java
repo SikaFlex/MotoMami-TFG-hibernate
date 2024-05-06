@@ -15,6 +15,7 @@ public class CustomerDTO {
     private String phone;
     private String gender;
     private String licence_type;
+    private String operatio;
     
     public CustomerDTO(String dNI, String name, String first_surname, String last_surname, String email,
             String birth_date, String postal_code, String street_type, String city, String number, String phone,
@@ -138,6 +139,15 @@ public class CustomerDTO {
         this.licence_type = licence_type;
     }
 
+    public void setOperatio(String operatio) {
+        this.operatio = operatio;
+    }
+
+    public String getOperatio() {
+        return operatio;
+    }
+
+    
 
 
 

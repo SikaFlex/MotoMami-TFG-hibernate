@@ -30,7 +30,7 @@ public class ProviderRepository implements InterfazProvider{
         session.close();
         return listProviders;
     } catch (Exception e) {
-       System.err.println("ERROR: "+e.getMessage());
+       System.err.println("ERROR getAllUserProviderActive() | ProviderRespository: "+e.getMessage());
     }
         return null;
     }
