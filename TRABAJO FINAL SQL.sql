@@ -21,7 +21,7 @@ CREATE TABLE MM_INTERFACE (
     updateBy VARCHAR(250),
     codError VARCHAR(20),
     errorMessage VARCHAR(4000),
-    statusProcess VARCHAR(10),
+    statusProcess VARCHAR(10), --STATUS PROCCES N-> nO HA SIDO PROCESADO, E, P 
     operation VARCHAR(250),--  New, Update   -- N -> no ha sido procesado  -- E-->  -- P--> Procesado
     resource VARCHAR(20),
     FOREIGN KEY (codProv) REFERENCES MM_PROVIDERS(id),

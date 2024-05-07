@@ -34,13 +34,15 @@ public class InterfazDTO {
     public InterfazDTO(String id, String idProv, String codExternal, String codProv, String constJson, Date createDate,
             Date lastUpdate, String createBy, String updateBy, String codError, String errorMessage,
             String statusProcess, String operation, String resource) {
+            
+        Date dateNow =   new java.sql.Date(System.currentTimeMillis());
         this.id = id;
         this.idProv = idProv;
         this.codExternal = codExternal;
         this.codProv = codProv;
         this.constJson = constJson;
-        this.createDate = createDate;
-        this.lastUpdate = lastUpdate;
+        this.createDate = dateNow;
+        this.lastUpdate = dateNow;
         this.createBy = createBy;
         this.updateBy = updateBy;
         this.codError = codError;

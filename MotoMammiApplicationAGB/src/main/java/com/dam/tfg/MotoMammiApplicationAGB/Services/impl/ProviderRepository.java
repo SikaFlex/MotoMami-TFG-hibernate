@@ -17,15 +17,15 @@ import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 @Repository
 public class ProviderRepository implements InterfazProvider{
     @Override
-    public List<ProviderDTO> getAllUsersPovidersActive() {
+    public List<ProviderDTO> getAllUsersPovidersActive(String p_prov, String p_date) {
     try {
         Session session=  HibernateUtil.getSession();
 
         List<ProviderDTO> listProviders= session.createQuery("FROM mm_providers where swiact = 1 "+
         "and ifnull(:p_date,current_date()) BETWEEN dateIni AND ifnull(dateEnd,'2099-12-31') "+
         "and codigoProveedor = ifnull(:p_prov, codigoProveedor)",ProviderDTO.class)
-        .setParameter("p_prov", null)
-        .setParameter("p_date", null)
+        .setParameter("p_prov", p_prov)//p_prov que le mandan al servicio por parametros
+        .setParameter("p_date", p_date)//p_date que le mandan al servicio por parametros
         .list();
         session.close();
         return listProviders;

@@ -18,10 +18,12 @@ import org.aspectj.apache.bcel.classfile.Constant;
 import org.hibernate.Hibernate;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.User.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.User.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
+import com.google.gson.Gson;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
 
@@ -56,15 +58,12 @@ public class ProccessServiceImpl {
     }
     public void readInfoFile(String source,String codProv, String date){
         try {
-       
             //en caso de que este vacio le pondra el dia de hoy
            String dateFile = date==null ? new SimpleDateFormat("yyyy-MM-dd").format(new Date())
                                         :new SimpleDateFormat("yyyy-MM-dd").format(date);
                       
-
             ProviderRepository PR = new ProviderRepository();
-
-            List<ProviderDTO> listaProveedoresActivos = PR.getAllUsersPovidersActive();
+            List<ProviderDTO> listaProveedoresActivos = PR.getAllUsersPovidersActive(codProv, dateFile);
          
             String vehicleFile;
             String partFile;
@@ -79,7 +78,9 @@ public class ProccessServiceImpl {
                 vehicleFile= path + vehiclesPath + codProvActivo + dateFile + format;
                 partFile= path + partsPath +  codProvActivo + dateFile + format;
                 customerFile= path + customerPath + codProvActivo + dateFile + format;
-
+                //tienes que leer los 3 archivos
+                // readFile(partFile, customerFile, codProv);
+                
 
             }
 
@@ -97,59 +98,50 @@ public class ProccessServiceImpl {
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(path)));
             String linea;
+            ArrayList<CustomerDTO>customerList = new ArrayList<>();
+            ArrayList<VehicleDTO>vehiclesList = new ArrayList<>();
+            ArrayList<PartsDTO>partsList = new ArrayList<>();
+            InterfazRepository interfazRepository = null;
+
             while ((linea=br.readLine())!= null) {
                 if (linea.contains("DNI")/*|| linea.contains("ID_VEHICLE") || linea.contains("ID_PARTS") */) {linea=br.readLine();}//si contiene DNI Skipeala
-
+                String[] splitData =linea.split(",");//spliteamos la linea
                 switch (constants) {
                     case "VEHICLES":
-                        ArrayList<VehicleDTO>vehiclesList = new ArrayList<>();
-                        //TODO: tratar archivo csv con los campos de customer    
+                //    VehicleDTO vehicleDTO = new vehicleDTO(
 
+                //    );
 
-                        break;
+                        break;//TODO: tratar archivo csv con los campos de customer    
+                        // vehiclesList
 
                     case "PART":
-                        
+                    PartsDTO partsDTO = new PartsDTO(
+
+                    );
+
+                
+                    partsList.add(partsDTO);
                         break;
 
                     case "CUS":
-                        InterfazRepository interfazRepository = null;
-                        ArrayList<CustomerDTO>customerList = new ArrayList<>();
-                        String[] cAtt =linea.split(",");//le pongo este nombre tan corto para que en el nuevo objeto no mida 3 campos de futbol
-                        CustomerDTO customerDTO = new CustomerDTO(
-                            cAtt[0],cAtt[1],cAtt[2],cAtt[3],
-                            cAtt[4],cAtt[5],cAtt[6],cAtt[7],
-                            cAtt[8],cAtt[9],cAtt[10],cAtt[11],
-                            cAtt[12]);
-                        customerList.add(customerDTO);//13 campos jiji
-                        String jsonToTheFile = ""; //esto deberia ser el JSON TODO: de donde saco este JSON y a que se refiere?
-                        if (!doValidatePersonIsInInterface(customerDTO,codprov)) {
+                          CustomerDTO customerDTO = new CustomerDTO(
+                            splitData[0],splitData[1],splitData[2],splitData[3],
+                            splitData[4],splitData[5],splitData[6],splitData[7],
+                            splitData[8],splitData[9],splitData[10],splitData[11],
+                            splitData[12]);
+                        customerList.add(customerDTO);
+ 
+                        if (!doValidatePersonIsInInterface(customerDTO,codprov)) { //Si no esta la persona en la tabla MM_interfaz
                             customerDTO.setOperatio(Constants.NEW); //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
-                            interfazRepository.insertCustomerToMMInterfaz(customerDTO); //procedemos a hacer el insert en base de datos
+                            interfazRepository.insertCustomerToMMInterfaz(customerDTO,codprov); //procedemos a hacer el insert en base de datos
 
-                            //Si no existe 
-                            
-
-                        }else if(existJsonAndIsDiferent(customerDTO,jsonToTheFile)){//en caso de que no exista el mismo json lo ingreso en update
-                            //query a la tabla para ver si ya estuviese en  interfaz repository
-                            customerDTO.setOperatio(Constants.UPD);
-                            interfazRepository.insertCustomerToMMInterfaz(customerDTO);
-
-                            
-
-                            //En caso de si este OPERATION: "UPD" Y SEA DIFERENTE EN CASO DE QUE SEA IGUAL NADA
-                            //compare con el que ya esta insertado en base de datos
-                            //en caso de que sea diferente hacemos un inster con update OPERATION= "UPD"
-                            //PREMOMINA EL JSON
-
-                            
+                        }else if(existJsonAndIsDiferent(customerDTO)){//en caso de ya exista un registo, mirara que el json no sea igual lo ingreso en update
+                            customerDTO.setOperatio(Constants.UPD);//Cambiamos el operation a UPD
+                            interfazRepository.insertCustomerToMMInterfaz(customerDTO,codprov);
                         }
-
+                        //En caso de que el json ya este y sea igual no se hace nada
                         }
-                        
-                        //Query en sql
-                        //CUSTOMER: DNI -- CODEXTERNAL 
-
                         break;
               
                 }
@@ -161,15 +153,28 @@ public class ProccessServiceImpl {
         }
     }
 
-    private boolean existJsonAndIsDiferent (CustomerDTO customerDTO, String jsonToTheFile){
+    /**
+     * @param customerDTO el objeto que va a comprobar si contiene un json en la tabla Interfaz
+     * @param jsonToTheFile el json que se va usar para comprar con la base de datos
+     * Esta funcion va a comprobar si existe un json y si es difente o igual al que ya esta almacenado en base de datos
+     * @return false: en caso de que exista pero sea igual
+     * @return true: en caso de que el json que este en base de datos sea diferente al que tenemos
+     * **/
+    private boolean existJsonAndIsDiferent (CustomerDTO customerDTO){
         InterfazRepository interfazRepository = null;
-        String jsonInterfaz = interfazRepository.haveJsonWithCustomer(customerDTO,jsonToTheFile);
+        String jsonInterfaz = interfazRepository.haveJsonWithCustomer(customerDTO);
         return jsonInterfaz.isEmpty() ? false : true; 
         //en caso de que sean iguales devolver un string vacio de ser asi se cumplira la condicion y sera false
         //por lo tanto no entrara en el condicional y no hara nada 
 
     }
 
+
+/**
+ * @param cutomerDTO objeto customer que vamos a mirar en la base de datos si esta
+ * @param  codProv Codigo de proveedor que vanmos a usar en la query
+ * 
+ */
     private boolean doValidatePersonIsInInterface(CustomerDTO customerDTO,String codProv) {
         InterfazRepository IR = new InterfazRepository();
         InterfazDTO interfazDTO = IR.getPersonOfInterfazWithCustomer(customerDTO,codProv);
