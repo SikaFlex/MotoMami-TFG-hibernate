@@ -6,3 +6,14 @@
 //customer lo leemos a la 1AM:
 //vehiculos lo leemos a las 2aM
 //Part lo leemos a las 3 am
+
+package com.dam.tfg.MotoMammiApplicationAGB.Utils;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+
+import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;

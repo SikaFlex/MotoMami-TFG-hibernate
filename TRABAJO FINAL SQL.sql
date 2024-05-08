@@ -68,8 +68,10 @@ CREATE TABLE IF NOT EXISTS MM_Customer (
 -- PARTS
 CREATE TABLE MM_PARTS(
 	ID_PROVEEDOR varchar(100) PRIMARY KEY,
-    
-    
+    id varchar(100),
+    codigoExterno varchar(100),
+    internalCod varchar(100),
+    descripcion varchar(100)
 );
 
 

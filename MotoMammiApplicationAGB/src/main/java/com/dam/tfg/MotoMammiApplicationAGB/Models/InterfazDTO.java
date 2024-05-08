@@ -5,15 +5,15 @@ import java.sql.Date;
 
 
 
+@Entity(name="mm_interface")
 @Table
-@Entity(name="MM_INTERFACE")
 public class InterfazDTO {
     @Id
     private String id;
     private String idProv;
     private String codExternal;
     private String codProv;
-    private String constJson;
+    private String contJson;
     private Date createDate;
     private Date lastUpdate;
     private String createBy;
@@ -40,7 +40,7 @@ public class InterfazDTO {
         this.idProv = idProv;
         this.codExternal = codExternal;
         this.codProv = codProv;
-        this.constJson = constJson;
+        this.contJson = contJson;
         this.createDate = dateNow;
         this.lastUpdate = dateNow;
         this.createBy = createBy;
@@ -102,14 +102,14 @@ public class InterfazDTO {
 
 
 
-    public String getConstJson() {
-        return constJson;
+    public String getcontJson() {
+        return contJson;
     }
 
 
 
-    public void setConstJson(String constJson) {
-        this.constJson = constJson;
+    public void setcontJson(String constJson) {
+        this.contJson = constJson;
     }
 
 
@@ -222,14 +222,6 @@ public class InterfazDTO {
     
     
 
-
-    /**
-     *
-    FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(id)
-     * 
-     * 
-     * 
-     */
 
 
      

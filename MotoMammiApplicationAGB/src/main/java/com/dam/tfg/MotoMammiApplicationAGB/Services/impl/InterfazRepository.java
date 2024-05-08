@@ -29,7 +29,7 @@ public class InterfazRepository {
         try {
             String dni = customerDTO.getDNI();
             Session session = HibernateUtil.getSession();
-            InterfazDTO interfazPerson= session.createQuery("from MM_INTERFACE where codExternal = :DNI and codProv = :CODPROV;",InterfazDTO.class)
+            InterfazDTO interfazPerson= session.createQuery("from mm_interface where codExternal = :DNI and codProv = :CODPROV",InterfazDTO.class)
             .setParameter("DNI", dni)
             .setParameter("CODPROV", codProv)
             .uniqueResult();

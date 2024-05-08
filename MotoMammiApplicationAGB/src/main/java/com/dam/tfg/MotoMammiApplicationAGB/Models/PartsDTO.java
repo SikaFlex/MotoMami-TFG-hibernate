@@ -1,7 +1,12 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Models;
 
 public class PartsDTO {
-    //TODO: MM_PARTS ATRIBUTES
-    
+   
+
+    private String id;
+    private String codigoExterno;
+    private String internalCod;
+    private String descripcion;
+
     
 }

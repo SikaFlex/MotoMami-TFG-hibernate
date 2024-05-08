@@ -26,25 +26,30 @@ import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 import com.google.gson.Gson;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 
 //proceso que lee el fichero
+@Service
 public class ProccessServiceImpl {
  
-    @Value("${path.in}")
-    String path;// /resources/in/
+    // @Value("${path.in}")
+    
+    public String path="C:\\Users\\Usuario\\Desktop\\MotoMami-TFG-hibernate\\MotoMammiApplicationAGB\\src\\main\\resources\\in\\";// /resources/in/
 
     @Value("${file.format.dat}")
-    String format;//.dat
+    public String format=".dat";//.dat
 
     @Value("${vehicle.path.file}")
-    String vehiclesPath;//MM_insurance_vehicle
+    String vehiclesPath="MM_insurance_vehicle";//MM_insurance_vehicle
 
     @Value("${customer.path.file}")
-    String customerPath;//MM_insurance_customers
+    String customerPath="MM_insurance_customers";//MM_insurance_customers
 
     @Value("${parts.path.file}")
-    String partsPath;//MM_insurance_parts
+    String partsPath="MM_insurance_parts";//MM_insurance_parts
     
     //leer archivo
     //con los 3 parametros buscamos el archivo
@@ -56,7 +61,9 @@ public class ProccessServiceImpl {
         psi.readInfoFile("CUS",null,null);
 
     }
+  
     public void readInfoFile(String source,String codProv, String date){
+        
         try {
             //en caso de que este vacio le pondra el dia de hoy
            String dateFile = date==null ? new SimpleDateFormat("yyyy-MM-dd").format(new Date())
@@ -79,16 +86,12 @@ public class ProccessServiceImpl {
                 partFile= path + partsPath +  codProvActivo + dateFile + format;
                 customerFile= path + customerPath + codProvActivo + dateFile + format;
                 //tienes que leer los 3 archivos
-                // readFile(partFile, customerFile, codProv);
+                readFile(customerFile,Constants.CUSTOMER, codProvActivo);
                 
 
             }
 
-
-        String formatFile =".dat";
    
-      
-        
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,12 +107,11 @@ public class ProccessServiceImpl {
             InterfazRepository interfazRepository = null;
 
             while ((linea=br.readLine())!= null) {
-                if (linea.contains("DNI")/*|| linea.contains("ID_VEHICLE") || linea.contains("ID_PARTS") */) {linea=br.readLine();}//si contiene DNI Skipeala
+                // if (linea.contains("DNI")/*|| linea.contains("ID_VEHICLE") || linea.contains("ID_PARTS") */) {linea=br.readLine();}//si contiene DNI Skipeala
                 String[] splitData =linea.split(",");//spliteamos la linea
                 switch (constants) {
                     case "VEHICLES":
                 //    VehicleDTO vehicleDTO = new vehicleDTO(
-
                 //    );
 
                         break;//TODO: tratar archivo csv con los campos de customer    
@@ -184,4 +186,34 @@ public class ProccessServiceImpl {
     }
 
 
+    public String getPath() {
+        return path;
+    }
+    public void setPath(String path) {
+        this.path = path;
+    }
+    public String getFormat() {
+        return format;
+    }
+    public void setFormat(String format) {
+        this.format = format;
+    }
+    public String getVehiclesPath() {
+        return vehiclesPath;
+    }
+    public void setVehiclesPath(String vehiclesPath) {
+        this.vehiclesPath = vehiclesPath;
+    }
+    public String getCustomerPath() {
+        return customerPath;
+    }
+    public void setCustomerPath(String customerPath) {
+        this.customerPath = customerPath;
+    }
+    public String getPartsPath() {
+        return partsPath;
+    }
+    public void setPartsPath(String partsPath) {
+        this.partsPath = partsPath;
+    }
 }
