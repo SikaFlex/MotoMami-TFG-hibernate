@@ -55,7 +55,7 @@ public class InterfazRepository {
 
             interfazDTO.setCodExternal(customerDTO.getDNI());//CodExternal-DNI
             interfazDTO.setCodProv(codprov);//CodProv-CodProv
-            interfazDTO.setConstJson(customerJson);//contJson-CustomerJson
+            interfazDTO.setcontJson(customerJson);//contJson-CustomerJson
             interfazDTO.setCreateBy(Constants.APP_NAME); //cratedBY-CONST NOMBRE DE LA APLICACION
             interfazDTO.setUpdateBy(Constants.APP_NAME); //UpdateBy- CONST NOMBRE DE APLICACION
             interfazDTO.setStatusProcess(Constants.SP_N);//statusProcess -> N -> NO HA SIDO PROCESADO
@@ -109,7 +109,7 @@ public class InterfazRepository {
             .uniqueResult();
 
            
-           String jsonToTheDataBase = interfazdDto.getConstJson();
+           String jsonToTheDataBase = interfazdDto.getcontJson();
            if (jsonToTheDataBase!=null) {//si lo encuentra
             return jsonToTheDataBase.equals(jsonToTheFile) ? "" : jsonToTheFile; 
             // si son iguales devuelve un string vacio de no serlo devuelves el Json del archivo
