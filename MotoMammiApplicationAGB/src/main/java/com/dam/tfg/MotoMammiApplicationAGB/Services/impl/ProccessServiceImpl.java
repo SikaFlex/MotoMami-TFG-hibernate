@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 //proceso que lee el fichero
 @Service
-public class ProccessServiceImpl implements ProccessService {
+public class ProccessServiceImpl implements ProccessService{
  
     // @Value("${path.in}")
     
@@ -64,18 +64,19 @@ public class ProccessServiceImpl implements ProccessService {
         
 
 
+
     }
 
 
-    //TERCER PROCESO
+    //TERCER PROCESO 1 VEZ AL MES
+    @Override
     public void voidGenerateInvoice(String codProv, String date) {
-    
-
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'voidGenerateInvoice'");
     }
 
-
-
-    //SEGUNDO PROCESO
+      //SEGUNDO PROCESO
+    @Override
     public void proccessIntegrateInfo(String source,String codProv, String date){
         //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
         //serializar el objeto ya sea cutomer,vehicle,parts 
@@ -84,6 +85,8 @@ public class ProccessServiceImpl implements ProccessService {
         //y una vez ejecutado la insercion actualizamos el statusprocess en la tabla interfaz con el valor P = procesado
 
     }
+
+    @Override
     public void readInfoFile(String source,String codProv, String date){
         
         try {
@@ -120,6 +123,7 @@ public class ProccessServiceImpl implements ProccessService {
             e.printStackTrace();
         }
     }
+
     private void readFile(String path, String constants,String codprov ){
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(path)));
@@ -135,10 +139,10 @@ public class ProccessServiceImpl implements ProccessService {
                 switch (constants) {
                     case "VEHICLES":
                 //    VehicleDTO vehicleDTO = new vehicleDTO(tipoVehiculo, matricula, marcaVehiculo, modelo );
-                    VehicleDTO vehicleDTO = new VehicleDTO(
-                        splitData[0],splitData[1],splitData[2],splitData[3]
-                    );
-                    vehiclesList.add(vehicleDTO);
+                    // VehicleDTO vehicleDTO = new VehicleDTO(
+                    //     splitData[0],splitData[1],splitData[2],splitData[3]
+                    // );
+                    // vehiclesList.add(vehicleDTO);
 
                     //vehiculo id -- dni
 
@@ -197,7 +201,7 @@ public class ProccessServiceImpl implements ProccessService {
      * @return false: en caso de que exista pero sea igual
      * @return true: en caso de que el json que este en base de datos sea diferente al que tenemos
      * **/
-    private boolean existJsonAndIsDiferent (CustomerDTO customerDTO){
+private boolean existJsonAndIsDiferent (CustomerDTO customerDTO){
         InterfazRepository interfazRepository = null;
         String jsonInterfaz = interfazRepository.haveJsonWithCustomer(customerDTO);
         return jsonInterfaz.isEmpty() ? false : true; 
@@ -212,7 +216,7 @@ public class ProccessServiceImpl implements ProccessService {
  * @param  codProv Codigo de proveedor que vanmos a usar en la query
  * 
  */
-    private boolean doValidatePersonIsInInterface(CustomerDTO customerDTO,String codProv) {
+private boolean doValidatePersonIsInInterface(CustomerDTO customerDTO,String codProv) {
         InterfazRepository IR = new InterfazRepository();
         InterfazDTO interfazDTO = IR.getPersonOfInterfazWithCustomer(customerDTO,codProv);
         return interfazDTO == null ?  false : true ; 
@@ -221,37 +225,7 @@ public class ProccessServiceImpl implements ProccessService {
     }
 
 
-    public String getPath() {
-        return path;
-    }
-    public void setPath(String path) {
-        this.path = path;
-    }
-    public String getFormat() {
-        return format;
-    }
-    public void setFormat(String format) {
-        this.format = format;
-    }
-    public String getVehiclesPath() {
-        return vehiclesPath;
-    }
-    public void setVehiclesPath(String vehiclesPath) {
-        this.vehiclesPath = vehiclesPath;
-    }
-    public String getCustomerPath() {
-        return customerPath;
-    }
-    public void setCustomerPath(String customerPath) {
-        this.customerPath = customerPath;
-    }
-    public String getPartsPath() {
-        return partsPath;
-    }
-    public void setPartsPath(String partsPath) {
-        this.partsPath = partsPath;
-    }
 
 
-   
+ 
 }

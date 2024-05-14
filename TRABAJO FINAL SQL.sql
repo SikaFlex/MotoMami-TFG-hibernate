@@ -34,15 +34,16 @@ where codExternal = @dni
 and codProv = @CodProv
 and contJson;
 
---
+-- Esta tabla pretende traducir cosas como la calle de los customer (en la clase estan los atributos que tenemos que comprobar)
 CREATE TABLE MM_TRANSLATION (
 id int,
-idProv varchar(250),
-cod_ext varchar(250),
-cod_int varchar(250),
+idProv varchar(250),--> con lo que buscar
+cod_ext varchar(250),-->como le llega desde el json ej: Rojo
+cod_int varchar(250),--> como debe salir -> Red
 date_ini date,
 date_end date,
-FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(id)
+FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(id) 
+--Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
 );
 
 
