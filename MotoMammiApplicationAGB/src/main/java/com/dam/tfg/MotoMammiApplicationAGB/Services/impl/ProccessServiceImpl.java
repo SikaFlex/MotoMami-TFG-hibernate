@@ -22,6 +22,7 @@ import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.User.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.User.VehicleDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Services.ProccessService;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 import com.google.gson.Gson;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
@@ -33,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 //proceso que lee el fichero
 @Service
-public class ProccessServiceImpl {
+public class ProccessServiceImpl implements ProccessService {
  
     // @Value("${path.in}")
     
@@ -59,9 +60,30 @@ public class ProccessServiceImpl {
         
         ProccessServiceImpl psi = new ProccessServiceImpl();
         psi.readInfoFile("CUS",null,null);
+    
+        
+
 
     }
-  
+
+
+    //TERCER PROCESO
+    public void voidGenerateInvoice(String codProv, String date) {
+    
+
+    }
+
+
+
+    //SEGUNDO PROCESO
+    public void proccessIntegrateInfo(String source,String codProv, String date){
+        //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
+        //serializar el objeto ya sea cutomer,vehicle,parts 
+        //una vez lo tenga serializado tengo que la traduccion EXTERNAL_COD --> MM_TRANSLATION  traducciendo por ejemplo street type
+        //insertar en las tablas maestras ya sea mm_customer...
+        //y una vez ejecutado la insercion actualizamos el statusprocess en la tabla interfaz con el valor P = procesado
+
+    }
     public void readInfoFile(String source,String codProv, String date){
         
         try {
@@ -88,6 +110,7 @@ public class ProccessServiceImpl {
                 //tienes que leer los 3 archivos
                 readFile(customerFile,Constants.CUSTOMER, codProvActivo);
                 
+      
 
             }
 
@@ -111,17 +134,29 @@ public class ProccessServiceImpl {
                 String[] splitData =linea.split(",");//spliteamos la linea
                 switch (constants) {
                     case "VEHICLES":
-                //    VehicleDTO vehicleDTO = new vehicleDTO(
-                //    );
+                //    VehicleDTO vehicleDTO = new vehicleDTO(tipoVehiculo, matricula, marcaVehiculo, modelo );
+                    VehicleDTO vehicleDTO = new VehicleDTO(
+                        splitData[0],splitData[1],splitData[2],splitData[3]
+                    );
+                    vehiclesList.add(vehicleDTO);
 
-                        break;//TODO: tratar archivo csv con los campos de customer    
-                        // vehiclesList
+                    //vehiculo id -- dni
+
+
+                    //TODO: que tengo que validar de vehicles?
+                    break;
+                    //TODO: tratar archivo csv con los campos de customer    
+                    // vehiclesList
 
                     case "PART":
-                    PartsDTO partsDTO = new PartsDTO(
+                        //external code id
 
-                    );
+                    //splitear y insertar en la la tabla interfaces
 
+                    PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3]);
+                    partsList.add(partsDTO);
+
+                    // TODO: que tengo que validar de PARTS?
                 
                     partsList.add(partsDTO);
                         break;
@@ -216,4 +251,7 @@ public class ProccessServiceImpl {
     public void setPartsPath(String partsPath) {
         this.partsPath = partsPath;
     }
+
+
+   
 }

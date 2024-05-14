@@ -12,6 +12,20 @@
 //     @Autowired
 //     ProccessService pService;
 
+
+//RNF7-AD La url para obtener la información de los ficheros tienen que ser: “localhost:8080/appInsurance/v1/readInfoFileVCS/{RESOURCE}/{CODPROV}/{DATE}”
+//(donde VCS tienen que ser vuestras credenciales)
+
+//
+// RNF8-AD La url para obtener la información de los ficheros tienen que ser: “localhost:8080/appInsurance/v1/processInfoFileVCS/{RESOURCE}/{CODPROV}/{DATE}”:
+// (donde VCS tienen que ser vuestras credenciales)
+// *{RESOURCE}--> indica la fuente de información que se quiere procesar(OBLIGATORIO).
+// *{CODPROV}--> indica el código del proveedor que queremos procesar la información(OPCIONAL), en caso de vacío se obtienen de todos los proveedores activos.
+// *{DATE}--> indica la fecha que queremos procesar la información(OPCIONAL), en caso de vacío se obtiene la fecha actual de sistema.
+
+
+// LLAMAR LA PROCESO QUE SE EJECUTA UNA VEZ AL MES 
+
 //     @RequestMapping(value =("/readInfo/{resource}/{codprov}/{date}"),
 //                     method = RequestMethod.GET,
 //                     produces = "application/json")

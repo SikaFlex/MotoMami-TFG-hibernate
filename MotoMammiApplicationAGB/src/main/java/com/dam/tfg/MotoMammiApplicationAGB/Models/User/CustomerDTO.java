@@ -2,20 +2,20 @@ package com.dam.tfg.MotoMammiApplicationAGB.Models.User;
 
 public class CustomerDTO {
 
-    private String DNI;
+    private String DNI; //id
     private String name;
     private String first_surname;
     private String last_surname;
     private String email;
     private String birth_date;
     private String postal_code;
-    private String street_type;
-    private String city;
+    private String street_type;//tradducir
+    private String city; // traducir ejemplo londre/londo
     private String number;
     private String phone;
-    private String gender;
-    private String licence_type;
-    private String operatio;
+    private String gender;//cambiar h y m / x f / m
+    private String licence_type;  // B A 
+    private String operatio; 
     
     public CustomerDTO(String dNI, String name, String first_surname, String last_surname, String email,
             String birth_date, String postal_code, String street_type, String city, String number, String phone,

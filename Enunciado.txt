@@ -94,3 +94,12 @@ RNF17- Hay que usar en las dependencias los groupId org.hibernate y org.hibernat
 
 
 
+
+
+
+
+ORDEN DE LA INSERCION
+    CUSTOMER OBJECT--
+        -INTERFAZ
+            -MM_TRANSLATION (traduce los externals code EXTERNAL CODE)
+                -MM_CUSTOMER (LOS QUE ESTAN EN STATUS: PROCESS)
