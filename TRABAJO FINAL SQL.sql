@@ -73,7 +73,13 @@ CREATE TABLE MM_PARTS(
     internalCod varchar(100),
     descripcion varchar(100)
 );
-
+--INVOICE (FACTURAS)
+CREATE TABLE MM_INVOICES(
+id varchar(100) PRIMARY KEY,
+DNI varchar(9), --> REFERENCIA A LA TABLA CUSTOMER
+matricula varchar(200), ---> REFERENCIA A LA TABLA VEHICLES
+fechaCobro DATE
+);
 
 
 
