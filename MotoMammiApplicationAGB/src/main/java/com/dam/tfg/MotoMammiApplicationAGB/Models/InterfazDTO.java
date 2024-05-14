@@ -11,7 +11,7 @@ public class InterfazDTO {
     @Id
     private String id;
     private String idProv;
-    private String codExternal;
+    private String codExternal; //HACE REFERENCIA AL ID DE LAS OTRAS TABLAS
     private String codProv;
     private String contJson;
     private Date createDate;

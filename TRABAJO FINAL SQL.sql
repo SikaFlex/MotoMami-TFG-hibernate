@@ -11,7 +11,7 @@ CREATE TABLE MM_PROVIDERS (
 -- Primera tabla 
 CREATE TABLE MM_INTERFACE (
     id VARCHAR(250),
-    idProv varchar(250),
+    idProv varchar(250),  -- HACE REFERENCIA AL ID DE LAS OTRAS TABLAS mm_cuTOMERS  ->   DNI VARCHAR(20) PRIMARY KEY, VEHICLES->MATRICULA , ID-> PROVEEDOR
     codExternal VARCHAR(250),
     codProv VARCHAR(250),
     contJson LONGTEXT,

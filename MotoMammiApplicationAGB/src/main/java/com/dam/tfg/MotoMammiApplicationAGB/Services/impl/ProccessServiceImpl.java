@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 public class ProccessServiceImpl implements ProccessService{
  
     // @Value("${path.in}")
-    
+    //TODO: CAMBIAR POR EL PROPERTIES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     public String path="C:\\Users\\Usuario\\Desktop\\MotoMami-TFG-hibernate\\MotoMammiApplicationAGB\\src\\main\\resources\\in\\";// /resources/in/
 
     @Value("${file.format.dat}")
@@ -71,8 +71,15 @@ public class ProccessServiceImpl implements ProccessService{
     //TERCER PROCESO 1 VEZ AL MES
     @Override
     public void voidGenerateInvoice(String codProv, String date) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'voidGenerateInvoice'");
+        /*
+         * RF4.2 Las facturas contendrán los campos de id, fecha, nombre empresa, cif empresa (41256985632), 
+         * dirección de la empresa (C/ Vergel, 5 Madrid, 28080), nombre usuario, apellidos usuario, dirección usuario, 
+         * tipo seguro, tipo de vehículo, fecha de registro,
+         *  fecha de fin de contrato (un año de duración), coste, iva (21% sobre el precio).
+         *   RF4.2-AD. La aplicación tendrá un proceso mensual que se lanzará el primer día de cada mes y genera un fichero con todas
+         *  las facturas del mes anterior(nombre fichero “MM_invoices_CODPROV_YYYYMM.csv”). Para que un proveedor firme digitalmente las facturas.
+         */
+       //GENERA UN ARCHIVO CON TODAS LAS FACTURA DE UN USUARIO
     }
 
       //SEGUNDO PROCESO
@@ -107,13 +114,13 @@ public class ProccessServiceImpl implements ProccessService{
                 String codProvActivo = proveedor.getCodigoProveedor();
                 
                 //buscar archivo con estos nombres por cada proveedor
+                customerFile= path + customerPath + codProvActivo + dateFile + format;
                 vehicleFile= path + vehiclesPath + codProvActivo + dateFile + format;
                 partFile= path + partsPath +  codProvActivo + dateFile + format;
-                customerFile= path + customerPath + codProvActivo + dateFile + format;
                 //tienes que leer los 3 archivos
                 readFile(customerFile,Constants.CUSTOMER, codProvActivo);
-                
-      
+                readFile(vehicleFile,Constants.VEHICLES, codProvActivo);
+                readFile(partFile,Constants.PARTS, codProvActivo);
 
             }
 
@@ -128,9 +135,7 @@ public class ProccessServiceImpl implements ProccessService{
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(path)));
             String linea;
-            ArrayList<CustomerDTO>customerList = new ArrayList<>();
-            ArrayList<VehicleDTO>vehiclesList = new ArrayList<>();
-            ArrayList<PartsDTO>partsList = new ArrayList<>();
+        
             InterfazRepository interfazRepository = null;
 
             while ((linea=br.readLine())!= null) {
@@ -138,32 +143,30 @@ public class ProccessServiceImpl implements ProccessService{
                 String[] splitData =linea.split(",");//spliteamos la linea
                 switch (constants) {
                     case "VEHICLES":
-                //    VehicleDTO vehicleDTO = new vehicleDTO(tipoVehiculo, matricula, marcaVehiculo, modelo );
-                    // VehicleDTO vehicleDTO = new VehicleDTO(
-                    //     splitData[0],splitData[1],splitData[2],splitData[3]
-                    // );
-                    // vehiclesList.add(vehicleDTO);
+                    VehicleDTO vehicleDTO = new VehicleDTO(
+                        splitData[0],splitData[1],splitData[2],splitData[3],splitData[4]
+                        );
+                        
+                //VehicleDTO vehicleDTO = new vehicleDTO(tipoVehiculo, matricula, marcaVehiculo, modelo, color);
 
                     //vehiculo id -- dni
+                    //MODIFICAR STATUS PROCESS DE LA TABLA INTERFAZ
 
 
-                    //TODO: que tengo que validar de vehicles?
+                    //TODO: validamos que no haya un json en la tabla interfaz filtrando por matricula -> dni y codProv
+                    //de ser asi lo insertamos como new si no hubiese mas y upd si tenemos que actualizarlo
                     break;
                     //TODO: tratar archivo csv con los campos de customer    
                     // vehiclesList
 
                     case "PART":
-                        //external code id
+                    PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3]);
+             
+                    //external code id
 
                     //splitear y insertar en la la tabla interfaces
-
-                    PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3]);
-                    partsList.add(partsDTO);
-
-                    // TODO: que tengo que validar de PARTS?
-                
-                    partsList.add(partsDTO);
-                        break;
+                    //lo mismo que ocn el resto
+                    break;
 
                     case "CUS":
                           CustomerDTO customerDTO = new CustomerDTO(
@@ -171,7 +174,6 @@ public class ProccessServiceImpl implements ProccessService{
                             splitData[4],splitData[5],splitData[6],splitData[7],
                             splitData[8],splitData[9],splitData[10],splitData[11],
                             splitData[12]);
-                        customerList.add(customerDTO);
  
                         if (!doValidatePersonIsInInterface(customerDTO,codprov)) { //Si no esta la persona en la tabla MM_interfaz
                             customerDTO.setOperatio(Constants.NEW); //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
@@ -223,9 +225,5 @@ private boolean doValidatePersonIsInInterface(CustomerDTO customerDTO,String cod
         //en caso de que sea null devolvera false y si encuentra algo no sera null entonce es true
 
     }
-
-
-
-
  
 }
