@@ -24,8 +24,8 @@ public class ProviderRepository implements InterfazProvider{
         List<ProviderDTO> listProviders= session.createQuery("FROM mm_providers where swiact = 1 "+
         "and ifnull(:p_date,current_date()) BETWEEN dateIni AND ifnull(dateEnd,'2099-12-31') "+
         "and codigoProveedor = ifnull(:p_prov, codigoProveedor)",ProviderDTO.class)
-        .setParameter("p_prov", null)
-        .setParameter("p_date", null)
+        .setParameter("p_prov", p_prov)
+        .setParameter("p_date", p_date)
         .list();
         session.close();
         return listProviders;
@@ -35,33 +35,20 @@ public class ProviderRepository implements InterfazProvider{
         return null;
     }
 
-    public static boolean doValidatePersonIsInInterface(String dni){
+    public ProviderDTO getProviderByCodProv(String codProv){
         try {
             Session session=  HibernateUtil.getSession();
-
-            @SuppressWarnings("deprecation")
-            InterfazDTO provider = session.createQuery("FROM MM_INTERFACE where codExternal = :DNI",InterfazDTO.class)
-                                        .setParameter("DNI", dni)
-                                        .uniqueResult();
-            if (provider == null) {return false;}
-            return true;
-            
+            return session.createQuery("FROM mm_providers where codigoProveedor = :CODPROV",ProviderDTO.class)
+            .setParameter("CODPROV",codProv)
+            .uniqueResult();
         } catch (Exception e) {
             System.err.println(e.getMessage());
-            return false;
+            return null;
         }
-
+     
     }
 
-     public void insertCustomerToMMInterfaz(CustomerDTO customerDTO){
-        try {
-            Session session = HibernateUtil.getSession();
-            session.persist(customerDTO);
-            session.close();
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-    }
+   
 
 
 }

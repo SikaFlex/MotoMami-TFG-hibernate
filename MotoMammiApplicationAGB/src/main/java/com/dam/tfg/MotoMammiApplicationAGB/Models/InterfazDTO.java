@@ -2,6 +2,7 @@ package com.dam.tfg.MotoMammiApplicationAGB.Models;
 
 import jakarta.persistence.*;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 
@@ -15,8 +16,8 @@ public class InterfazDTO {
     private String codExternal; //HACE REFERENCIA AL ID DE LAS OTRAS TABLAS
     private String codProv;
     private String contJson;
-    private Date createDate;
-    private Date lastUpdate;
+    private Timestamp createDate;
+    private Timestamp lastUpdate;
     private String createBy;
     private String updateBy;
     private String codError;
@@ -37,19 +38,19 @@ public class InterfazDTO {
 
 
 
-    public InterfazDTO(String id, String idProv, String codExternal, String codProv, String contJson, Date createDate,
-        Date lastUpdate, String createBy, String updateBy, String codError, String errorMessage,
-        String statusProcess, String operation, String resource) {
 
-        Date dateNow =  new java.sql.Date(System.currentTimeMillis());
-        UUID uuid = UUID.randomUUID();
-        this.id = uuid.toString();
+
+
+    public InterfazDTO(String id, String idProv, String codExternal, String codProv, String contJson,
+            Timestamp createDate, Timestamp lastUpdate, String createBy, String updateBy, String codError,
+            String errorMessage, String statusProcess, String operation, String resource) {
+        this.id = id;
         this.idProv = idProv;
         this.codExternal = codExternal;
         this.codProv = codProv;
         this.contJson = contJson;
-        this.createDate = dateNow;
-        this.lastUpdate = dateNow;
+        this.createDate = createDate;
+        this.lastUpdate = lastUpdate;
         this.createBy = createBy;
         this.updateBy = updateBy;
         this.codError = codError;
@@ -58,6 +59,13 @@ public class InterfazDTO {
         this.operation = operation;
         this.resource = resource;
     }
+
+
+
+
+
+
+
 
 
 
@@ -121,28 +129,71 @@ public class InterfazDTO {
 
 
 
-    public Date getCreateDate() {
+   
+
+
+    public String getContJson() {
+        return contJson;
+    }
+
+
+
+
+
+
+
+
+
+
+    public Timestamp getCreateDate() {
         return createDate;
     }
 
 
 
-    public void setCreateDate(java.util.Date dateNow) {
-        this.createDate = (Date) dateNow;
-    }
 
 
 
-    public Date getLastUpdate() {
+
+
+
+
+    public Timestamp getLastUpdate() {
         return lastUpdate;
     }
 
 
 
-    public void setLastUpdate(java.util.Date dateNow) {
-        this.lastUpdate = (Date) dateNow;
+
+
+
+
+
+
+
+    public void setLastUpdate(Timestamp lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
+
+
+
+
+
+
+
+
+
+    public void setCreateDate(Timestamp timeNow) {
+        this.createDate =   timeNow;
+    }
+
+
+
+  
+
+
+   
 
 
     public String getCreateBy() {

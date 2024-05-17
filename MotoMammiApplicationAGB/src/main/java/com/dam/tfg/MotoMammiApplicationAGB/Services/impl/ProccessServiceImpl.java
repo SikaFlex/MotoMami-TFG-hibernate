@@ -22,11 +22,12 @@ import com.dam.tfg.MotoMammiApplicationAGB.Models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
-import com.dam.tfg.MotoMammiApplicationAGB.Models.User.VehicleDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.InterfazRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.PropertiesConfig;
+import com.dam.tfg.MotoMammiApplicationAGB.Utils.Utils;
 import com.google.gson.Gson;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
@@ -132,6 +133,11 @@ public class ProccessServiceImpl implements ProccessService{
                     case "VEHICLES":
                     VehicleDTO vehicleDTO = new VehicleDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4]);
                         
+                    if (!isInInterface(vehicleDTO.getMatricula(),codprov)) {
+                        interfazRepository.insertVehicleToInterfaz(vehicleDTO,codprov,Constants.NEW);
+                    }
+
+
                     //VehicleDTO vehicleDTO = new vehicleDTO(tipoVehiculo, matricula, marcaVehiculo, modelo, color);
 
                     //vehiculo id -- dni
@@ -174,53 +180,83 @@ public class ProccessServiceImpl implements ProccessService{
 
 
 @SuppressWarnings("deprecation")
-private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
+
+private boolean isInInterface(String externalCod,String codProv) {
+    InterfazRepository IR = new InterfazRepository();
+    InterfazDTO interfazDTO = IR.getPersonOfInterfazWithExternalCod(externalCod,codProv);
+    return interfazDTO == null ?  false : true ; 
+    //si no encuentra algo significa que esta en la base datos entonces devolvera true
+
+}
+
+
+/**
+ * Guardara el mensaje de error en la base de datos
+ * @param e Excepcion para poder recuperar su mensaje
+ */
+@SuppressWarnings("deprecation")
+private void insertErrorMessage(Exception e){
+    try {
+        String errorMessage = e.getMessage()!= null ? e.getMessage() : Constants.UNKNOW_ERROR ; //-> valido que no me meta null
+        Session session = HibernateUtil.getSession();
+        InterfazDTO interfazDTO = new InterfazDTO();
+
+        interfazDTO.setCreateDate(Utils.timeNow());
+        interfazDTO.setStatusProcess(Constants.SP_E); //--> StatusProcess: E -> ERROR
+        interfazDTO.setCodError(Constants.ERROR_HIBERNATE);//-> dentro del catch de hibernate este es el causante
+        interfazDTO.setErrorMessage(errorMessage);//--> Mensaje de error
+
+        session.beginTransaction();
+        session.save(interfazDTO);//Guardamos el objeto
+        session.getTransaction().commit();
+        session.close();
+        
+    } catch (Exception exception) {
+       System.err.println(exception.getMessage());
+       System.err.println(Constants.UNKNOW_ERROR);//en caso de que estalle tambien esto pues ERROR DESCONOCIDO
+    }
+}
+
+
+///////////////////////////////////////////////////////////////////     VEHICLE   ///////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////////////////////////////////////     CUSTOMER   ///////////////////////////////////////////////////////////////////////////////////
+
+
+
+ private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
     try {
         CustomerDTO customerDTO = new CustomerDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5],splitData[6],
                                                   splitData[7],splitData[8],splitData[9],splitData[10],splitData[11],splitData[12]);
  
-     if (notIsPersonInInterface(customerDTO,codprov)) { //Si no esta la persona en la tabla MM_interfaz
-         interfazRepository.insertCustomerToMMInterfaz(customerDTO,codprov,Constants.NEW); //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
+     if (!isInInterface(customerDTO.getDNI(),codprov)) { //Si no esta la persona en la tabla MM_interfaz
+         interfazRepository.insertCustomerToInterfaz(customerDTO,codprov,Constants.NEW); //Insertarlo con la operacion como :new es un campo que solo rellena la primera vez) -> OPERATION: "NEW"
 
-     }else if(existJsonAndIsDiferent(customerDTO,codprov)){//en caso de ya exista un registo, mirara que el json no sea igual lo ingreso con OPERATION = "UPD" ->update
-         interfazRepository.insertCustomerToMMInterfaz(customerDTO,codprov,Constants.UPD);//Cambiamos el operation a UPD
+     }else if(existJsonAndIsDifferentCustomer(customerDTO,codprov)){//en caso de ya exista un registo, mirara que el json no sea igual lo actualizara con OPERATION = "UPD" ->update
+         interfazRepository.insertCustomerToInterfaz(customerDTO,codprov,Constants.UPD);//Cambiamos el operation a UPD
      }
         //En caso de que el json ya este y sea igual no se hace nada
      
-    } catch (Exception e) {
+    } catch (Exception error) {
+        insertErrorMessage(error);
+        System.err.println(error.getMessage());
      /* En caso de error durante el proceso se guardara el error en la tabla interfaz */
-     try {
-         String errorMessage = e.getMessage()!= null ? e.getMessage() : "NO SE PUDO RECUPERAR EL MENSAJE DE ERROR" ; //-> valido que no me meta null
-         Session session = HibernateUtil.getSession();
-         InterfazDTO interfazDTO = new InterfazDTO();
-
-         interfazDTO.setStatusProcess(Constants.SP_E); //--> StatusProcess: E -> ERROR
-         interfazDTO.setCodError(Constants.ERROR_HIBERNATE);//-> dentro del catch de hibernate este es el causante
-         interfazDTO.setErrorMessage(errorMessage);//--> Mensaje de error
-
-         session.beginTransaction();
-         session.save(interfazDTO);//Guardamos el objeto
-         session.getTransaction().commit();
-         session.close();
-
-         System.err.println(e.getMessage());
-         
-     } catch (Exception exception) {
-        System.err.println(exception.getMessage());
-        System.err.println(Constants.UNKNOW_ERROR);//en caso de que estalle tambien esto pues ERROR DESCONOCIDO
-     }
+ 
  }
 }
 
 
     /**
+     * Comprueba si existe un json y si es diferente o igual al que ya esta almacenado en base de datos
      * @param customerDTO el objeto que va a comprobar si contiene un json en la tabla Interfaz
      * @param jsonToTheFile el json que se va usar para comprar con la base de datos
-     * Esta funcion va a comprobar si existe un json y si es difente o igual al que ya esta almacenado en base de datos
      * @return  true si no hay el contJson del la tabla interfaz no es igual a nuestro archivo
      * 
      * **/
-private boolean existJsonAndIsDiferent (CustomerDTO customerDTO,String codProv){
+private boolean existJsonAndIsDifferentCustomer (CustomerDTO customerDTO,String codProv){
         InterfazRepository interfazRepository = new InterfazRepository();
         InterfazDTO jsonInterfaz = interfazRepository.haveJsonWithCustomer(customerDTO,codProv);
         return jsonInterfaz != null ? true : false; 
@@ -228,18 +264,11 @@ private boolean existJsonAndIsDiferent (CustomerDTO customerDTO,String codProv){
        //y guardar el nuevo record en la base de datos. En caso de que encuentre uno igual devolvera false para que no haga nada.
     }
 
-
 /**
  * @param cutomerDTO objeto customer que vamos a mirar en la base de datos si esta
  * @param  codProv Codigo de proveedor que vanmos a usar en la query
  * 
  */
-private boolean notIsPersonInInterface(CustomerDTO customerDTO,String codProv) {
-        InterfazRepository IR = new InterfazRepository();
-        InterfazDTO interfazDTO = IR.getPersonOfInterfazWithCustomer(customerDTO,codProv);
-        return interfazDTO == null ?  true : false ; 
-        //si no encuentra algo sigunifica que esta en la base datos entonces devolvera true
 
-    }
  
 }

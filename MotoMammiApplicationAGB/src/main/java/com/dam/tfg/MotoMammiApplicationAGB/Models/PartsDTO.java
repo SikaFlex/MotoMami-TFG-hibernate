@@ -1,12 +1,18 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Models;
 
+import java.sql.Timestamp;
+
 public class PartsDTO {
    
 
     private String id;
+    private String id_invoice;
     private String codigoExterno;
     private String internalCod;
     private String descripcion;
+    private Timestamp dateNotification;
+    private String matricula;
+   
 
 
 
