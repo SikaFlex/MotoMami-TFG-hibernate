@@ -28,10 +28,7 @@ public class InterfazDTO {
 
     //Le configuramos un ID dinamico al mismo objeto y que recoja la fecha de creacion directamente del sistema
     public InterfazDTO() {
-        Date dateNow =  new java.sql.Date(System.currentTimeMillis());
-        UUID uuid = UUID.randomUUID();
-        this.id = uuid.toString();
-        this.createDate = dateNow;
+     
     }
 
 
@@ -130,8 +127,8 @@ public class InterfazDTO {
 
 
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setCreateDate(java.util.Date dateNow) {
+        this.createDate = (Date) dateNow;
     }
 
 
@@ -142,8 +139,8 @@ public class InterfazDTO {
 
 
 
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
+    public void setLastUpdate(java.util.Date dateNow) {
+        this.lastUpdate = (Date) dateNow;
     }
 
 

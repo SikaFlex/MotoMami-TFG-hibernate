@@ -52,12 +52,15 @@ public class InterfazRepository {
     @SuppressWarnings("deprecation")
     public void insertCustomerToMMInterfaz(CustomerDTO customerDTO,String codprov,String operation){
         try {
+            InterfazRepository interfazRepository = new InterfazRepository();
+            Date dateNow =  new java.sql.Date(System.currentTimeMillis());
 
             Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
             Session session = HibernateUtil.getSession();
             InterfazDTO interfazDTO = new InterfazDTO();
             //convertir customerDTO en un json
             String customerJson = gson.toJson(customerDTO);
+        
 
             interfazDTO.setCodExternal(customerDTO.getDNI());//CodExternal-DNI
             interfazDTO.setCodProv(codprov);//CodProv-CodProv
@@ -67,13 +70,35 @@ public class InterfazRepository {
             interfazDTO.setStatusProcess(Constants.SP_N);//statusProcess -> N -> NO HA SIDO PROCESADO
             interfazDTO.setResource(Constants.CUSTOMER);//Resource: Customer
             interfazDTO.setOperation(operation); //le ponemos El OPERATION
-                 
 
-            //insertarlo en la tabla MM_INTERFAZ
-            session.beginTransaction();
-            session.save(interfazDTO);
-            session.getTransaction().commit();
-            session.close();
+            //en caso de que sea nuevo lo guardas
+            if (operation==Constants.NEW) {
+                UUID uuid = UUID.randomUUID();
+             
+
+                interfazDTO.setId(uuid.toString());
+                interfazDTO.setCreateDate(dateNow);
+
+                session.beginTransaction();
+                session.save(interfazDTO);
+                session.getTransaction().commit();
+                session.close();
+            }
+            //en caso de que este pero el json sea diferente lo actualizas
+            if (operation==Constants.UPD) {
+                //recuperamos el ID de la base de datos 
+                InterfazDTO objectOfDataBase = interfazRepository.getPersonOfInterfazWithCustomer(customerDTO, codprov);
+                String id = objectOfDataBase.getId();
+                
+                interfazDTO.setId(id);
+                interfazDTO.setLastUpdate(dateNow);
+
+                session.beginTransaction();
+                session.update(interfazDTO);;
+                session.getTransaction().commit();
+                session.close();
+            }
+           
         } catch (Exception e) {
            e.printStackTrace();
         }
@@ -96,13 +121,12 @@ public class InterfazRepository {
             InterfazDTO interfazdDto = session.createQuery("from mm_interface where codExternal = :DNI and codProv = :CODPROV",InterfazDTO.class)
             .setParameter("DNI", dni)
             .setParameter("CODPROV", codprov)
-          
             .uniqueResult();
             
 
             if (interfazdDto==null) { return null; }//control de errores por si no lo encuentra
             Boolean isEquals = jsonToTheFile.equals(interfazdDto.getcontJson());
-            System.out.println(isEquals);
+
             return isEquals ? null : interfazdDto;
             /* Compruebo yo si son iguales ya mysql no se como compara 2 Strings pero se ve que no estrictamente iguales
              * haciendolo asi puedo asegurarme de que el formato es exactamente el mismo. */

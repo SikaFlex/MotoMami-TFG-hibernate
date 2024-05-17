@@ -39,17 +39,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProccessServiceImpl implements ProccessService{
  
-    // public static void main(String[] args) {
-    //     ProccessServiceImpl psi = new ProccessServiceImpl();
+    public static void main(String[] args) {
+        ProccessServiceImpl psi = new ProccessServiceImpl();
        
 
-    //     psi.readInfoFile("CUS",null,null);
+        psi.readInfoFile("CUS",null,null);
     
         
 
 
 
-    // }
+    }
 
 
     //TERCER PROCESO 1 VEZ AL MES
