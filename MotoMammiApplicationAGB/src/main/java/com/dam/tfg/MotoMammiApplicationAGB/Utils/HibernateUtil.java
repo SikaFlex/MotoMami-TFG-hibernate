@@ -1,5 +1,9 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Utils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistry;
@@ -10,7 +14,7 @@ import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 
 public class HibernateUtil {
-    
+
     public static Session getSession(){
 		SessionFactory sessionFactory;
 		Configuration configuration = new Configuration();

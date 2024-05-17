@@ -1,6 +1,6 @@
-package com.dam.tfg.MotoMammiApplicationAGB.Services;
+package com.dam.tfg.MotoMammiApplicationAGB.Services.impl;
 
-import com.dam.tfg.MotoMammiApplicationAGB.Models.User.CustomerDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.CustomerDTO;
 
 public interface ProccessService {
     public void readInfoFile(String source,String codProv, String date);

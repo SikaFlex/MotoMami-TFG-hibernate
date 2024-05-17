@@ -2,6 +2,7 @@ package com.dam.tfg.MotoMammiApplicationAGB.Models;
 
 import jakarta.persistence.*;
 import java.sql.Date;
+import java.util.UUID;
 
 
 
@@ -25,18 +26,27 @@ public class InterfazDTO {
     private String resource;
 
 
-    
+    //Le configuramos un ID dinamico al mismo objeto y que recoja la fecha de creacion directamente del sistema
     public InterfazDTO() {
+        Date dateNow =  new java.sql.Date(System.currentTimeMillis());
+        UUID uuid = UUID.randomUUID();
+        this.id = uuid.toString();
+        this.createDate = dateNow;
     }
 
 
 
-    public InterfazDTO(String id, String idProv, String codExternal, String codProv, String constJson, Date createDate,
-            Date lastUpdate, String createBy, String updateBy, String codError, String errorMessage,
-            String statusProcess, String operation, String resource) {
-            
-        Date dateNow =   new java.sql.Date(System.currentTimeMillis());
-        this.id = id;
+  
+
+
+
+    public InterfazDTO(String id, String idProv, String codExternal, String codProv, String contJson, Date createDate,
+        Date lastUpdate, String createBy, String updateBy, String codError, String errorMessage,
+        String statusProcess, String operation, String resource) {
+
+        Date dateNow =  new java.sql.Date(System.currentTimeMillis());
+        UUID uuid = UUID.randomUUID();
+        this.id = uuid.toString();
         this.idProv = idProv;
         this.codExternal = codExternal;
         this.codProv = codProv;
@@ -218,6 +228,12 @@ public class InterfazDTO {
 
     public void setResource(String resource) {
         this.resource = resource;
+    }
+
+
+
+    public void setContJson(String contJson) {
+        this.contJson = contJson;
     }
     
     

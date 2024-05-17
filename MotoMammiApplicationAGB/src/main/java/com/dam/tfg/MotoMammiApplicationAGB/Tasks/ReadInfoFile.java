@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dam.tfg.MotoMammiApplicationAGB.Services.ProccessService;
+import com.dam.tfg.MotoMammiApplicationAGB.Services.impl.ProccessService;
 import com.dam.tfg.MotoMammiApplicationAGB.Services.impl.ProccessServiceImpl;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 

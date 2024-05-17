@@ -22,36 +22,4 @@ public class MotoMammiApplicationAgbApplication {
 		SpringApplication.run(MotoMammiApplicationAgbApplication.class);
 	}
 
-	// public static void main(String[] args) {
-	// 	//Springboot initi soolo    esto es solo para probar ⬇️
-	// 	Session session=null;
-	// 	HibernateUtil hu = new HibernateUtil();
-
-	// 	try{
-	// 		session = hu.getSession();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	// 	}catch(Exception e){
-	// 		System.err.println(e.getMessage());
-	// 	}finally{
-	// 		session.close();
-	// 	}
-	// }
-
-
-	
-  
-
 }

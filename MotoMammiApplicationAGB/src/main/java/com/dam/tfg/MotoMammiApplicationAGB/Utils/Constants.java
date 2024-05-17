@@ -12,10 +12,8 @@ public class Constants {
      public final static String UPD = "UDP";
 
 
-     /*
-     Nombre de la aplicacion a la hora de insertar en la tabla Interfaz
-     */ 
-    public final static String APP_NAME = "MOTOMAMI_AGB";
+   
+   
 
 
 
@@ -38,6 +36,6 @@ public class Constants {
     /*
      * ERRORS:
      */
-    public final static String UNKNOW_ERROR = "OCURRIO UN FALLO INSESPERADO";
+    public static String UNKNOW_ERROR = "OCURRIO UN FALLO INSESPERADO";
     public final static String ERROR_HIBERNATE = "HIBERNATE";
 }
