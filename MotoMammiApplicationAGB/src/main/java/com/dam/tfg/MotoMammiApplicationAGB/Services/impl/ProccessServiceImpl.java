@@ -119,13 +119,22 @@ public class ProccessServiceImpl implements ProccessService{
         try {
             InterfazRepository interfazRepository = new InterfazRepository();
             BufferedReader br = new BufferedReader(new FileReader(new File(pathCompost)));
-            
-            
             String linea;
+            
             while ((linea=br.readLine())!= null) {
-                if (linea.contains(Constants.SKIP_VEHICLE) || linea.contains(Constants.SKIP_CUSTOMER) || linea.contains(Constants.SKIP_PARTS)){linea=br.readLine();}//skipeamos la primera linea
-                String[] splitData =linea.split(",");//spliteamos la linea
+                /*
+                 * SE QUITA ESTE CONTROL DE ERRORES POR DECISION PERSONAL YA QUE ES UNA MINA DE BUGS Y COMO ALFINAL ESTO SE PUEDE ACORDAR CON EL CLIENTE
+                 * SE DECIDE QUE EL FORMATO SERA SIN LA FILA DE LAS COLUMNAS ARRIBA
+                */
+                // if (linea.contains(Constants.SKIP_VEHICLE) || linea.contains(Constants.SKIP_CUSTOMER) || linea.contains(Constants.SKIP_PARTS) || linea == null){linea=br.readLine();}
+                String[] splitData =linea.split(","); 
+                
+                
+               
+                
                 switch (constants) {
+
+
                     case Constants.VEHICLES:
                     insertVehicleToInterfaceTable(splitData,interfazRepository,codprov);
                     break;

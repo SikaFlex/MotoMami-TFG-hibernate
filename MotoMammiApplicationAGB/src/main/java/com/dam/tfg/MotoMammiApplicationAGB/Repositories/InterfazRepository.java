@@ -79,7 +79,7 @@ public class InterfazRepository {
             String objectJson = gson.toJson(partsDTO);
             
             
-            interfazDTO.setCodExternal(partsDTO.getMatricula());//CodExternal-DNI
+            interfazDTO.setCodExternal(partsDTO.getCodigoExterno());//CodExternal-DNI
             interfazDTO.setCodProv(codprov);//CodProv-CodProv
             interfazDTO.setcontJson(objectJson);//contJson-objectJson
             interfazDTO.setCreateBy(PropertiesConfig.APP_NAME); //cratedBY -> NOMBRE DE LA APLICACION
@@ -102,7 +102,7 @@ public class InterfazRepository {
             //en caso de que este pero el json sea diferente lo actualizas
             if (operation==Constants.UPD) {
                 //recuperamos el ID de la base de datos 
-                InterfazDTO objectOfDataBase = getPersonOfInterfazWithExternalCod(partsDTO.getMatricula(), codprov);
+                InterfazDTO objectOfDataBase = getPersonOfInterfazWithExternalCod(partsDTO.getCodigoExterno(), codprov);
              
                 
             
@@ -136,8 +136,8 @@ public class InterfazRepository {
             .setParameter("CODEXT", codExt)
             .setParameter("CODPROV", codprov)
             .uniqueResult();
+       
             
-    
             if (interfazdDto==null) { return null; }//control de errores por si no lo encuentra
             Boolean isEquals = jsonToTheFile.equals(interfazdDto.getcontJson());
     
