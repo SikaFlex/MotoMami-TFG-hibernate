@@ -11,6 +11,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO;
 
@@ -23,7 +24,7 @@ public class HibernateUtil {
 		configuration.addAnnotatedClass(ProviderDTO.class);
 		configuration.addAnnotatedClass(InterfazDTO.class);
 		configuration.addAnnotatedClass(VehicleDTO.class);
-		
+		configuration.addAnnotatedClass(PartsDTO.class);
 		// configuration.addAnnotatedClass(Users_cide.class); InterfazDTO
 
 		StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

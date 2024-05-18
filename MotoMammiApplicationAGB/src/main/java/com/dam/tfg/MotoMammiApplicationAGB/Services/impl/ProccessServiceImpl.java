@@ -41,12 +41,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProccessServiceImpl implements ProccessService{
  
-    public static void main(String[] args) {
-        ProccessServiceImpl psi = new ProccessServiceImpl();
+    // public static void main(String[] args) {
+    //     ProccessServiceImpl psi = new ProccessServiceImpl();
        
-        psi.readInfoFile("CUS",null,null);
+    //     psi.readInfoFile("CUS",null,null);
     
-    }
+    // }
 
 
     //TERCER PROCESO 1 VEZ AL MES
@@ -124,7 +124,7 @@ public class ProccessServiceImpl implements ProccessService{
             while ((linea=br.readLine())!= null) {
                 /*
                  * SE QUITA ESTE CONTROL DE ERRORES POR DECISION PERSONAL YA QUE ES UNA MINA DE BUGS Y COMO ALFINAL ESTO SE PUEDE ACORDAR CON EL CLIENTE
-                 * SE DECIDE QUE EL FORMATO SERA SIN LA FILA DE LAS COLUMNAS ARRIBA
+                 * SE DECIDE QUE EL FORMATO SERA SIN LA FILA DE LAS COLUMNAS ARRIBA 
                 */
                 // if (linea.contains(Constants.SKIP_VEHICLE) || linea.contains(Constants.SKIP_CUSTOMER) || linea.contains(Constants.SKIP_PARTS) || linea == null){linea=br.readLine();}
                 String[] splitData =linea.split(","); 
@@ -169,7 +169,7 @@ public class ProccessServiceImpl implements ProccessService{
 
 
 
-private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
+    private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
     try {
         CustomerDTO customerDTO = new CustomerDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5],splitData[6],
                                                   splitData[7],splitData[8],splitData[9],splitData[10],splitData[11],splitData[12]);

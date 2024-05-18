@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-@Entity(name="mm_providers")
+@Entity(name="mm_parts")
 @Table
 public class PartsDTO {
    
