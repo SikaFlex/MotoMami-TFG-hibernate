@@ -11,7 +11,7 @@
 
          <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO"/>
          <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO."/>
-
+         <mapping class="com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO."/>
        <!-- <mapping class="com.dam.U4EX01_CIDE_AGB.Users_cide"/> -->
 
     </session-factory>

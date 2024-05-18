@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
@@ -55,6 +56,105 @@ public class InterfazRepository {
     }
 
 
+
+
+
+
+///////////////////////////////////////////////////////////////////     PARTS   ///////////////////////////////////////////////////////////////////////////////////
+
+
+
+    /** transforma el customer en un json y lo inserta en la tabla MM_INTERFACE**/
+    @SuppressWarnings("deprecation")
+    public void insertPartToInterfaz(PartsDTO partsDTO,String codprov,String operation){
+        try {
+            ProviderRepository providerRepository = new ProviderRepository();
+            Session session = HibernateUtil.getSession();
+            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
+           
+
+            ProviderDTO provider = providerRepository.getProviderByCodProv(codprov);
+            InterfazDTO interfazDTO = new InterfazDTO();
+            //convertir customerDTO en un json
+            String objectJson = gson.toJson(partsDTO);
+            
+            
+            interfazDTO.setCodExternal(partsDTO.getMatricula());//CodExternal-DNI
+            interfazDTO.setCodProv(codprov);//CodProv-CodProv
+            interfazDTO.setcontJson(objectJson);//contJson-objectJson
+            interfazDTO.setCreateBy(PropertiesConfig.APP_NAME); //cratedBY -> NOMBRE DE LA APLICACION
+            interfazDTO.setStatusProcess(Constants.SP_N);//statusProcess -> N -> NO HA SIDO PROCESADO
+            interfazDTO.setResource(Constants.PARTS);//Resource: Customer
+            interfazDTO.setOperation(operation); //le ponemos El OPERATION
+            interfazDTO.setIdProv(provider.getId());
+
+            //en caso de que sea nuevo lo guardas
+            if (operation==Constants.NEW) {
+
+                interfazDTO.setId(Utils.randomID());
+                interfazDTO.setCreateDate(Utils.timeNow());
+
+                session.beginTransaction();
+                session.save(interfazDTO);
+                session.getTransaction().commit();
+                session.close();
+            }
+            //en caso de que este pero el json sea diferente lo actualizas
+            if (operation==Constants.UPD) {
+                //recuperamos el ID de la base de datos 
+                InterfazDTO objectOfDataBase = getPersonOfInterfazWithExternalCod(partsDTO.getMatricula(), codprov);
+             
+                
+            
+                interfazDTO.setId(objectOfDataBase.getId());
+                interfazDTO.setCreateDate(objectOfDataBase.getCreateDate());
+                interfazDTO.setLastUpdate(Utils.timeNow());
+                interfazDTO.setUpdateBy(PropertiesConfig.APP_NAME); //UpdateBy -> NOMBRE DE APLICACION
+
+                session.beginTransaction();
+                session.update(interfazDTO);;
+                session.getTransaction().commit();
+                session.close();
+            }
+           
+        } catch (Exception e) {
+           e.printStackTrace();
+        }
+    }
+
+
+
+
+    public InterfazDTO haveJsonWithPart(PartsDTO partsDTO,String codprov){
+        try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();//es importante que el json tenga el mismo formato que el que esta en base de datos
+            String jsonToTheFile = gson.toJson(partsDTO); //lo convertimos en JSON para guardarlo en la tabla interfaz
+    
+            String codExt = partsDTO.getCodigoExterno();
+            Session session = HibernateUtil.getSession();
+            InterfazDTO interfazdDto = session.createQuery("from mm_interface where codExternal = :CODEXT and codProv = :CODPROV",InterfazDTO.class)
+            .setParameter("CODEXT", codExt)
+            .setParameter("CODPROV", codprov)
+            .uniqueResult();
+            
+    
+            if (interfazdDto==null) { return null; }//control de errores por si no lo encuentra
+            Boolean isEquals = jsonToTheFile.equals(interfazdDto.getcontJson());
+    
+            return isEquals ? null : interfazdDto;
+            /* Compruebo yo si son iguales ya mysql no se como compara 2 Strings pero se ve que no estrictamente iguales
+             * haciendolo asi puedo asegurarme de que el formato es exactamente el mismo. */
+    
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return null; //en caso de error devolvera null y se asegurara asi que se guarda el registro
+        }
+    
+    }
+
+
+
+
 ///////////////////////////////////////////////////////////////////     VEHICLE   ///////////////////////////////////////////////////////////////////////////////////
 
 @SuppressWarnings("deprecation")
@@ -68,9 +168,8 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
 
     interfazDTO.setCodExternal(vehicleDTO.getMatricula());//CodExternal-DNI
     interfazDTO.setCodProv(codprov);//CodProv-CodProv
-    interfazDTO.setcontJson(vehicleJson);//contJson-CustomerJson
+    interfazDTO.setcontJson(vehicleJson);//contJson-objectJson
     interfazDTO.setCreateBy(PropertiesConfig.APP_NAME); //cratedBY -> NOMBRE DE LA APLICACION
-    interfazDTO.setUpdateBy(PropertiesConfig.APP_NAME); //UpdateBy -> NOMBRE DE APLICACION
     interfazDTO.setStatusProcess(Constants.SP_N);//statusProcess -> N -> NO HA SIDO PROCESADO
     interfazDTO.setResource(Constants.VEHICLES);//Resource: Customer
     interfazDTO.setOperation(operation); //le ponemos El OPERATION
@@ -78,11 +177,12 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
 
 
     if (operation==Constants.NEW) {
-        UUID uuid = UUID.randomUUID();
+       
      
 
-        interfazDTO.setId(uuid.toString());
+        interfazDTO.setId(Utils.randomID());
         interfazDTO.setCreateDate(Utils.timeNow());
+
 
         session.beginTransaction();
         session.save(interfazDTO);
@@ -99,6 +199,8 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
         interfazDTO.setId(objectOfDataBase.getId());
         interfazDTO.setCreateDate(objectOfDataBase.getCreateDate());
         interfazDTO.setLastUpdate(Utils.timeNow());
+        interfazDTO.setUpdateBy(PropertiesConfig.APP_NAME); //UpdateBy -> NOMBRE DE APLICACION
+
 
         session.beginTransaction();
         session.update(interfazDTO);;
@@ -110,7 +212,32 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
 }
 
 
+public InterfazDTO haveJsonWithVehicle(VehicleDTO vehicleDTO,String codprov){
+    try {
+        Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();//es importante que el json tenga el mismo formato que el que esta en base de datos
+        String jsonToTheFile = gson.toJson(vehicleDTO); //lo convertimos en JSON para guardarlo en la tabla interfaz
 
+        String matricula = vehicleDTO.getMatricula();
+        Session session = HibernateUtil.getSession();
+        InterfazDTO interfazdDto = session.createQuery("from mm_interface where codExternal = :MATRICULA and codProv = :CODPROV",InterfazDTO.class)
+        .setParameter("MATRICULA", matricula)
+        .setParameter("CODPROV", codprov)
+        .uniqueResult();
+        
+
+        if (interfazdDto==null) { return null; }//control de errores por si no lo encuentra
+        Boolean isEquals = jsonToTheFile.equals(interfazdDto.getcontJson());
+
+        return isEquals ? null : interfazdDto;
+        /* Compruebo yo si son iguales ya mysql no se como compara 2 Strings pero se ve que no estrictamente iguales
+         * haciendolo asi puedo asegurarme de que el formato es exactamente el mismo. */
+
+    } catch (Exception e) {
+        System.err.println(e.getMessage());
+        return null; //en caso de error devolvera null y se asegurara asi que se guarda el registro
+    }
+
+}
 
 
 
@@ -126,23 +253,20 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
     public void insertCustomerToInterfaz(CustomerDTO customerDTO,String codprov,String operation){
         try {
             ProviderRepository providerRepository = new ProviderRepository();
-           
-          
+            Session session = HibernateUtil.getSession();
+            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
            
 
-            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
-            Session session = HibernateUtil.getSession();
             ProviderDTO provider = providerRepository.getProviderByCodProv(codprov);
             InterfazDTO interfazDTO = new InterfazDTO();
             //convertir customerDTO en un json
-            String customerJson = gson.toJson(customerDTO);
+            String objectJson = gson.toJson(customerDTO);
             
             
             interfazDTO.setCodExternal(customerDTO.getDNI());//CodExternal-DNI
             interfazDTO.setCodProv(codprov);//CodProv-CodProv
-            interfazDTO.setcontJson(customerJson);//contJson-CustomerJson
+            interfazDTO.setcontJson(objectJson);//contJson-objectJson
             interfazDTO.setCreateBy(PropertiesConfig.APP_NAME); //cratedBY -> NOMBRE DE LA APLICACION
-            interfazDTO.setUpdateBy(PropertiesConfig.APP_NAME); //UpdateBy -> NOMBRE DE APLICACION
             interfazDTO.setStatusProcess(Constants.SP_N);//statusProcess -> N -> NO HA SIDO PROCESADO
             interfazDTO.setResource(Constants.CUSTOMER);//Resource: Customer
             interfazDTO.setOperation(operation); //le ponemos El OPERATION
@@ -150,10 +274,10 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
 
             //en caso de que sea nuevo lo guardas
             if (operation==Constants.NEW) {
-                UUID uuid = UUID.randomUUID();
+                
              
 
-                interfazDTO.setId(uuid.toString());
+                interfazDTO.setId(Utils.randomID());
                 interfazDTO.setCreateDate(Utils.timeNow());
 
                 session.beginTransaction();
@@ -171,6 +295,7 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
                 interfazDTO.setId(objectOfDataBase.getId());
                 interfazDTO.setCreateDate(objectOfDataBase.getCreateDate());
                 interfazDTO.setLastUpdate(Utils.timeNow());
+                interfazDTO.setUpdateBy(PropertiesConfig.APP_NAME); //UpdateBy -> NOMBRE DE APLICACION
 
                 session.beginTransaction();
                 session.update(interfazDTO);;

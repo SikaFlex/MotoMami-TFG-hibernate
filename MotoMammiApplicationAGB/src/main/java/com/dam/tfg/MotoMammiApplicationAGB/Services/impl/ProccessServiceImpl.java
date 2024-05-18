@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.Buffer;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,13 +44,8 @@ public class ProccessServiceImpl implements ProccessService{
     public static void main(String[] args) {
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
-
         psi.readInfoFile("CUS",null,null);
     
-        
-
-
-
     }
 
 
@@ -102,12 +98,12 @@ public class ProccessServiceImpl implements ProccessService{
                 customerFile= PropertiesConfig.PATH + PropertiesConfig.CUSTOMER_PATH_FILE + codProvActivo + dateFile + PropertiesConfig.FORMAT;
                 vehicleFile= PropertiesConfig.PATH + PropertiesConfig.VEHICLE_PATH_FILE + codProvActivo + dateFile + PropertiesConfig.FORMAT;
                 partFile= PropertiesConfig.PATH + PropertiesConfig.PARTS_PATH_FILE +  codProvActivo + dateFile + PropertiesConfig.FORMAT;
-           
-
+                
+              
                 //tienes que leer los 3 archivos
                 readFile(customerFile,Constants.CUSTOMER, codProvActivo);
-                // readFile(vehicleFile,Constants.VEHICLES, codProvActivo);
-                // readFile(partFile,Constants.PARTS, codProvActivo);
+                readFile(vehicleFile,Constants.VEHICLES, codProvActivo);
+                readFile(partFile,Constants.PARTS, codProvActivo);
 
             }
 
@@ -127,39 +123,18 @@ public class ProccessServiceImpl implements ProccessService{
             
             String linea;
             while ((linea=br.readLine())!= null) {
-                // if (linea.contains("DNI")/*|| linea.contains("ID_VEHICLE") || linea.contains("ID_PARTS") */) {linea=br.readLine();}//si contiene DNI Skipeala
+                if (linea.contains(Constants.SKIP_VEHICLE) || linea.contains(Constants.SKIP_CUSTOMER) || linea.contains(Constants.SKIP_PARTS)){linea=br.readLine();}//skipeamos la primera linea
                 String[] splitData =linea.split(",");//spliteamos la linea
                 switch (constants) {
-                    case "VEHICLES":
-                    VehicleDTO vehicleDTO = new VehicleDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4]);
-                        
-                    if (!isInInterface(vehicleDTO.getMatricula(),codprov)) {
-                        interfazRepository.insertVehicleToInterfaz(vehicleDTO,codprov,Constants.NEW);
-                    }
-
-
-                    //VehicleDTO vehicleDTO = new vehicleDTO(tipoVehiculo, matricula, marcaVehiculo, modelo, color);
-
-                    //vehiculo id -- dni
-                    //MODIFICAR STATUS PROCESS DE LA TABLA INTERFAZ
-
-
-                    //TODO: validamos que no haya un json en la tabla interfaz filtrando por matricula -> dni y codProv
-                    //de ser asi lo insertamos como new si no hubiese mas y upd si tenemos que actualizarlo
+                    case Constants.VEHICLES:
+                    insertVehicleToInterfaceTable(splitData,interfazRepository,codprov);
                     break;
-                    //TODO: tratar archivo csv con los campos de customer    
-                    // vehiclesList
-
-                    case "PART":
-                    PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3]);
-             
-                    //external code id
-
-                    //splitear y insertar en la la tabla interfaces
-                    //lo mismo que ocn el resto
+               
+                    case Constants.PARTS:
+                    insertPartsToInterfaceTable(splitData,interfazRepository,codprov);
                     break;
                         
-                    case "CUS":
+                    case Constants.CUSTOMER:
                     insertCustomerToInterfaceTable(splitData,interfazRepository,codprov);
                     break;
                    
@@ -179,55 +154,13 @@ public class ProccessServiceImpl implements ProccessService{
 
 
 
-@SuppressWarnings("deprecation")
-
-private boolean isInInterface(String externalCod,String codProv) {
-    InterfazRepository IR = new InterfazRepository();
-    InterfazDTO interfazDTO = IR.getPersonOfInterfazWithExternalCod(externalCod,codProv);
-    return interfazDTO == null ?  false : true ; 
-    //si no encuentra algo significa que esta en la base datos entonces devolvera true
-
-}
-
-
-/**
- * Guardara el mensaje de error en la base de datos
- * @param e Excepcion para poder recuperar su mensaje
- */
-@SuppressWarnings("deprecation")
-private void insertErrorMessage(Exception e){
-    try {
-        String errorMessage = e.getMessage()!= null ? e.getMessage() : Constants.UNKNOW_ERROR ; //-> valido que no me meta null
-        Session session = HibernateUtil.getSession();
-        InterfazDTO interfazDTO = new InterfazDTO();
-
-        interfazDTO.setCreateDate(Utils.timeNow());
-        interfazDTO.setStatusProcess(Constants.SP_E); //--> StatusProcess: E -> ERROR
-        interfazDTO.setCodError(Constants.ERROR_HIBERNATE);//-> dentro del catch de hibernate este es el causante
-        interfazDTO.setErrorMessage(errorMessage);//--> Mensaje de error
-
-        session.beginTransaction();
-        session.save(interfazDTO);//Guardamos el objeto
-        session.getTransaction().commit();
-        session.close();
-        
-    } catch (Exception exception) {
-       System.err.println(exception.getMessage());
-       System.err.println(Constants.UNKNOW_ERROR);//en caso de que estalle tambien esto pues ERROR DESCONOCIDO
-    }
-}
-
-
-///////////////////////////////////////////////////////////////////     VEHICLE   ///////////////////////////////////////////////////////////////////////////////////
-
-
 
 
 ///////////////////////////////////////////////////////////////////     CUSTOMER   ///////////////////////////////////////////////////////////////////////////////////
 
 
 
- private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
+private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
     try {
         CustomerDTO customerDTO = new CustomerDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5],splitData[6],
                                                   splitData[7],splitData[8],splitData[9],splitData[10],splitData[11],splitData[12]);
@@ -245,7 +178,7 @@ private void insertErrorMessage(Exception e){
         System.err.println(error.getMessage());
      /* En caso de error durante el proceso se guardara el error en la tabla interfaz */
  
- }
+    }
 }
 
 
@@ -256,19 +189,136 @@ private void insertErrorMessage(Exception e){
      * @return  true si no hay el contJson del la tabla interfaz no es igual a nuestro archivo
      * 
      * **/
-private boolean existJsonAndIsDifferentCustomer (CustomerDTO customerDTO,String codProv){
+    private boolean existJsonAndIsDifferentCustomer (CustomerDTO customerDTO,String codProv){
+    try {
         InterfazRepository interfazRepository = new InterfazRepository();
         InterfazDTO jsonInterfaz = interfazRepository.haveJsonWithCustomer(customerDTO,codProv);
         return jsonInterfaz != null ? true : false; 
        //Si es null significa el json de base de datos no es igual entonces devolvera true para que pueda entrar en el condicional
        //y guardar el nuevo record en la base de datos. En caso de que encuentre uno igual devolvera false para que no haga nada.
+    } catch (Exception e) {
+      System.err.println(e.getMessage());
+      return false;
     }
 
-/**
- * @param cutomerDTO objeto customer que vamos a mirar en la base de datos si esta
- * @param  codProv Codigo de proveedor que vanmos a usar en la query
- * 
- */
+    }
 
+
+
+
+
+///////////////////////////////////////////////////////////////////     VEHICLE   ///////////////////////////////////////////////////////////////////////////////////
+
+private void insertVehicleToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
+    try {
+        VehicleDTO vehicleDTO = new VehicleDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5]);
+        
+         if (!isInInterface(vehicleDTO.getMatricula(),codprov)) {
+         interfazRepository.insertVehicleToInterfaz(vehicleDTO,codprov,Constants.NEW);
+         }else if(existJsonAndIsDifferentVehicle(vehicleDTO,codprov)){//en caso de ya exista un registo, mirara que el json no sea igual lo actualizara con OPERATION = "UPD" ->update
+         interfazRepository.insertVehicleToInterfaz(vehicleDTO,codprov,Constants.UPD);//Cambiamos el operation a UPD
+         }
+
+    }catch (Exception error) {
+        insertErrorMessage(error);
+        System.err.println(error.getMessage());
+     /* En caso de error durante el proceso se guardara el error en la tabla interfaz */
+    }
+}
+
+private boolean existJsonAndIsDifferentVehicle(VehicleDTO vehicleDTO,String codProv){
+    try {
+        InterfazRepository interfazRepository = new InterfazRepository();
+        InterfazDTO jsonInterfaz = interfazRepository.haveJsonWithVehicle(vehicleDTO,codProv);
+        return jsonInterfaz != null ? true : false; 
+
+    } catch (Exception e) {
+       System.err.println(e.getMessage());
+       return false;
+    }
+
+}
+
+
+
+///////////////////////////////////////////////////////////////////     PARTS   ///////////////////////////////////////////////////////////////////////////////////
+//TODO MIRAR POR QUE DUPLICA
+private void insertPartsToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
+    try {
+        java.sql.Date dateNotification= Utils.stringToSqlDate(splitData[6]); //parseamos la fecha que nos viene en el archivo
+
+        PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5],dateNotification);
+        
+         if (!isInInterface(partsDTO.getCodigoExterno(),codprov)) {
+         interfazRepository.insertPartToInterfaz(partsDTO,codprov,Constants.NEW);
+         }else if(existJsonAndIsDifferentParts(partsDTO,codprov)){//en caso de ya exista un registo, mirara que el json no sea igual lo actualizara con OPERATION = "UPD" ->update
+         interfazRepository.insertPartToInterfaz(partsDTO,codprov,Constants.UPD);//Cambiamos el operation a UPD
+         }
+
+    }catch (Exception error) {
+        insertErrorMessage(error);
+        System.err.println(error.getMessage());
+     /* En caso de error durante el proceso se guardara el error en la tabla interfaz */
+    }
+}
+
+private boolean existJsonAndIsDifferentParts(PartsDTO partsDTO,String codProv){
+    try {
+        InterfazRepository interfazRepository = new InterfazRepository();
+        InterfazDTO jsonInterfaz = interfazRepository.haveJsonWithPart(partsDTO,codProv);
+        return jsonInterfaz != null ? true : false; 
+
+    } catch (Exception e) {
+       System.err.println(e.getMessage());
+       return false;
+    }
+
+}
+
+///////////////////////////////////////////////////////////////////     GENERIC   ///////////////////////////////////////////////////////////////////////////////////
+
+
+ 
+private boolean isInInterface(String externalCod,String codProv) {
+    try {
+    InterfazRepository IR = new InterfazRepository();
+    InterfazDTO interfazDTO = IR.getPersonOfInterfazWithExternalCod(externalCod,codProv);
+    return interfazDTO != null ?  true : false ; 
+    //si no encuentra algo significa que esta en la base datos entonces devolvera true
+
+    } catch (Exception e) {
+        System.err.println(e.getMessage());
+        return false;
+    }
+   
+}
+
+
+/**
+ * Guardara el mensaje de error en la base de datos
+ * @param e Excepcion para poder recuperar su mensaje
+ */
+@SuppressWarnings("deprecation")
+private void insertErrorMessage(Exception e){
+    try {
+        String errorMessage = e.getMessage()!= null ? e.getMessage() : Constants.UNKNOW_ERROR ; //-> valido que no me meta null
+        Session session = HibernateUtil.getSession();
+        InterfazDTO interfazDTO = new InterfazDTO();
+
+        interfazDTO.setCreateDate(Utils.timeNow());
+        interfazDTO.setStatusProcess(Constants.SP_E); //--> StatusProcess: E -> ERROR
+        interfazDTO.setCodError(Constants.ERROR_HIBERNATE);//-> dentro del catch de hibernate este es el causante de todos nuestros males
+        interfazDTO.setErrorMessage(errorMessage);//--> Mensaje de error
+
+        session.beginTransaction();
+        session.save(interfazDTO);//Guardamos el objeto
+        session.getTransaction().commit();
+        session.close();
+        
+    } catch (Exception exception) {
+       System.err.println(exception.getMessage());
+       System.err.println(Constants.UNKNOW_ERROR);//en caso de que estalle tambien esto pues ERROR DESCONOCIDO
+    }
+}
  
 }

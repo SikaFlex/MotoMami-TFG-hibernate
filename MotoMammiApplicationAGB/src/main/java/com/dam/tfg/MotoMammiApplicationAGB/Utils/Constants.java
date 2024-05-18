@@ -13,7 +13,11 @@ public class Constants {
 
 
    
-   
+   //SKIPEAR LINEAS
+   public final static String SKIP_CUSTOMER = "DNI";
+   public final static String SKIP_VEHICLE = "matricula";
+   public final static String SKIP_PARTS = "codigoExterno";
+
 
 
 

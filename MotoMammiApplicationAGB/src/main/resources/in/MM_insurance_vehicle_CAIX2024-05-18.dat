@@ -1,0 +1,13 @@
+matricula,tipoVehiculo,marcaVehiculo,modelo,color,dniUsuario
+ABC1234,Coche,Toyota,Corolla,Rojo,12345678A
+XYZ5678,Motocicleta,Honda,CBR600RR,Negro,87654321B
+LMN9101,Camión,Mercedes,Actros,Blanco,23456789C
+PQR2345,SUV,Chevrolet,Tahoe,Azul,34567890D
+STU6789,Coche,Volkswagen,Golf,Gris,45678901E
+JKL1234,Van,Ford,Transit,Verde,56789012F
+DEF5678,Coche,Audi,A4,Amarillo,67890123G
+GHI9012,SUV,BMW,X5,Plateado,78901234H
+MNO3456,Motocicleta,Yamaha,MT-07,Rojo,89012345I
+VWX7890,Camión,Volvo,FMX,Negro,90123456J
+VWX7890,MODIFICADOOOOOO,Volvo,FMX,Negro,90123456J
+

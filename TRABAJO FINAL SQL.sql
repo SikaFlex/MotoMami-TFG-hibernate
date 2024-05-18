@@ -39,14 +39,14 @@ cod_ext varchar(250), -- como le llega desde el json ej: Rojo
 cod_int varchar(250), -- como debe salir -> Red
 date_ini date,
 date_end date,
-FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(id)           -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
+FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)           -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
 
 );
 
 
 
 -- CREATE TABLE CUSTOMERS
-CREATE TABLE IF NOT EXISTS MM_Customer (
+CREATE TABLE IF NOT EXISTS MM_CUSTOMER (
     DNI VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100),
     first_surname VARCHAR(100),
@@ -64,11 +64,15 @@ CREATE TABLE IF NOT EXISTS MM_Customer (
 );
 -- PARTS
 CREATE TABLE MM_PARTS(
-	ID_PROVEEDOR varchar(100) PRIMARY KEY,
-    id varchar(100),
-    codigoExterno varchar(100),
-    internalCod varchar(100),
-    descripcion varchar(100)
+id varchar(100) PRIMARY KEY,
+codigoExterno varchar(100),
+internalCod varchar(100),
+descripcion varchar(100),
+dateNotification date,
+matricula varchar(100),
+idInvoice varchar(100),
+dniVehicle varchar(100),
+FOREIGN KEY (dniVehicle) REFERENCES MM_VEHICLES(dniUsuario)
 );
 -- INVOICE (FACTURAS)
 CREATE TABLE MM_INVOICES(
@@ -78,10 +82,17 @@ matricula varchar(200), -- REFERENCIA A LA TABLA VEHICLES
 fechaCobro DATE
 );
 
-
-
-
-
+-- VEHICLES
+CREATE TABLE MM_VEHICLES (
+id varchar(100) PRIMARY KEY,
+matricula varchar(100),  
+tipoVehiculo varchar(100),
+marcaVehiculo varchar(100),
+modelo varchar(100),
+color varchar(100),       
+dniUsuario varchar(100),
+FOREIGN KEY (dniUsuario) REFERENCES MM_CUSTOMER(DNI)   
+);
 
 
 

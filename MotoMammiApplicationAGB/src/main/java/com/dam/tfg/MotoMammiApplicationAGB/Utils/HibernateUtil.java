@@ -12,6 +12,7 @@ import org.hibernate.cfg.Configuration;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO;
 
 public class HibernateUtil {
 
@@ -21,6 +22,7 @@ public class HibernateUtil {
 		configuration.configure("hibernate.cfg.xml");
 		configuration.addAnnotatedClass(ProviderDTO.class);
 		configuration.addAnnotatedClass(InterfazDTO.class);
+		configuration.addAnnotatedClass(VehicleDTO.class);
 		
 		// configuration.addAnnotatedClass(Users_cide.class); InterfazDTO
 
