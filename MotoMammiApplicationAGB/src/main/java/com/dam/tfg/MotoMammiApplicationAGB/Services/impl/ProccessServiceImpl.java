@@ -5,19 +5,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.sql.Timestamp;
+
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
+
 
 import org.hibernate.Session;
-import org.hibernate.query.Query;
-import org.springframework.beans.factory.annotation.Value;
-import org.aspectj.apache.bcel.classfile.Constant;
-import org.hibernate.Hibernate;
+
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
@@ -29,11 +26,10 @@ import com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.PropertiesConfig;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Utils;
-import com.google.gson.Gson;
+
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+
 import org.springframework.stereotype.Service;
 
 
@@ -41,12 +37,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProccessServiceImpl implements ProccessService{
  
-    // public static void main(String[] args) {
-    //     ProccessServiceImpl psi = new ProccessServiceImpl();
+    public static void main(String[] args) {
+        ProccessServiceImpl psi = new ProccessServiceImpl();
        
-    //     psi.readInfoFile("CUS",null,null);
+        psi.readInfoFile("CUS",null,null);
     
-    // }
+    }
 
 
     //TERCER PROCESO 1 VEZ AL MES
@@ -82,14 +78,16 @@ public class ProccessServiceImpl implements ProccessService{
            String dateFile = date==null ? new SimpleDateFormat("yyyy-MM-dd").format(new Date())
                                         : new SimpleDateFormat("yyyy-MM-dd").format(date);
                       
+                                        
+              if (source==null) {
+                
+              }                          
             ProviderRepository PR = new ProviderRepository();
-            List<ProviderDTO> listaProveedoresActivos = PR.getAllUsersPovidersActive(codProv, dateFile);
-         
             String vehicleFile;
             String partFile;
             String customerFile;
-
-                //recorremos los proveedores activos
+            List<ProviderDTO> listaProveedoresActivos = PR.getAllUsersPovidersActive(codProv, dateFile);
+            //recorremos los proveedores activos
             for (ProviderDTO proveedor : listaProveedoresActivos) {
                 // Recuperamos el código del proveedor
                 String codProvActivo = proveedor.getCodigoProveedor();
@@ -114,7 +112,6 @@ public class ProccessServiceImpl implements ProccessService{
         }
     }
     
-    @SuppressWarnings("deprecation")
     private void readFile(String pathCompost, String constants,String codprov ){
         try {
             InterfazRepository interfazRepository = new InterfazRepository();
@@ -129,9 +126,7 @@ public class ProccessServiceImpl implements ProccessService{
                 // if (linea.contains(Constants.SKIP_VEHICLE) || linea.contains(Constants.SKIP_CUSTOMER) || linea.contains(Constants.SKIP_PARTS) || linea == null){linea=br.readLine();}
                 String[] splitData =linea.split(","); 
                 
-                
-               
-                
+    
                 switch (constants) {
 
 
@@ -148,7 +143,9 @@ public class ProccessServiceImpl implements ProccessService{
                     break;
                    
                 }
+              
             }
+            br.close();
         
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -251,7 +248,7 @@ private boolean existJsonAndIsDifferentVehicle(VehicleDTO vehicleDTO,String codP
 
 
 ///////////////////////////////////////////////////////////////////     PARTS   ///////////////////////////////////////////////////////////////////////////////////
-//TODO MIRAR POR QUE DUPLICA
+
 private void insertPartsToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
     try {
         java.sql.Date dateNotification= Utils.stringToSqlDate(splitData[6]); //parseamos la fecha que nos viene en el archivo

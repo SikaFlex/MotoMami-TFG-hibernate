@@ -39,7 +39,7 @@ cod_ext varchar(250), -- como le llega desde el json ej: Rojo
 cod_int varchar(250), -- como debe salir -> Red
 date_ini date,
 date_end date,
-FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)           -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
+FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)    -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
 
 );
 
@@ -49,6 +49,7 @@ FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)           -- Se tr
 CREATE TABLE IF NOT EXISTS MM_CUSTOMER (
     DNI VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100),
+    first_surname VARCHAR(100),
     first_surname VARCHAR(100),
     last_surname VARCHAR(100),
     email VARCHAR(100),
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS MM_CUSTOMER (
     licence_type VARCHAR(50),
     operation VARCHAR(10)
 );
+
 -- PARTS
 CREATE TABLE MM_PARTS(
 id varchar(100) PRIMARY KEY,
@@ -74,6 +76,7 @@ idInvoice varchar(100),
 dniVehicle varchar(100),
 FOREIGN KEY (dniVehicle) REFERENCES MM_VEHICLES(dniUsuario)
 );
+
 -- INVOICE (FACTURAS)
 CREATE TABLE MM_INVOICES(
 id varchar(100) PRIMARY KEY,
