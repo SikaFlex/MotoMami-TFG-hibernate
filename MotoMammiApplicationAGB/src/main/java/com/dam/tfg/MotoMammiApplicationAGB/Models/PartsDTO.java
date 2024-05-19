@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import com.dam.tfg.MotoMammiApplicationAGB.Utils.Utils;
+
 @Entity(name="mm_parts")
 @Table
 public class PartsDTO {
@@ -28,14 +30,14 @@ public class PartsDTO {
 
 
     public PartsDTO( String codigoExterno, String internalCod, String descripcion, String matricula,
-            String idInvoice, String dniVehicle, Date dateNotification) {
+            String idInvoice, String dniVehicle, String dateNotification) {
         this.codigoExterno = codigoExterno;
         this.internalCod = internalCod;
         this.descripcion = descripcion;
         this.matricula = matricula;
         this.idInvoice = idInvoice;
         this.dniVehicle = dniVehicle;
-        this.dateNotification = dateNotification;
+        this.dateNotification = Utils.stringToSqlDate(dateNotification);
     }
 
     public String getId() {

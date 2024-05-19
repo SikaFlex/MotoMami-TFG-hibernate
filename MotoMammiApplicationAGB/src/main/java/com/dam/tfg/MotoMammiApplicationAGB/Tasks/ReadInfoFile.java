@@ -1,22 +1,10 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Tasks;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-//proceso que se ejecuta una dependiendo de lo que pongas en propertis sera el tiempo de ejecucion
-//scheduler 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.dam.tfg.MotoMammiApplicationAGB.Services.impl.ProccessService;
 import com.dam.tfg.MotoMammiApplicationAGB.Services.impl.ProccessServiceImpl;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 

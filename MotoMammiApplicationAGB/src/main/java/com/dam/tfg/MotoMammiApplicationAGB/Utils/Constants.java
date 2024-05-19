@@ -10,6 +10,7 @@ public class Constants {
       **/
      public final static String NEW = "NEW"; 
      public final static String UPD = "UDP";
+     public final static String ERR = "ERROR";
 
 
    
@@ -37,9 +38,5 @@ public class Constants {
 
     public final static String path = ".dat";
 
-    /*
-     * ERRORS:
-     */
-    public static String UNKNOW_ERROR = "OCURRIO UN FALLO INSESPERADO";
-    public final static String ERROR_HIBERNATE = "HIBERNATE";
+ 
 }

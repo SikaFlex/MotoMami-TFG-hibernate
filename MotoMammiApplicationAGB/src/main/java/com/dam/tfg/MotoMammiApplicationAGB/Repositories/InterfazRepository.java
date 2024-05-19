@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.sql.Date;
+import java.util.List;
 import java.util.UUID;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Constants;
 import org.aspectj.apache.bcel.classfile.Constant;
@@ -44,7 +45,6 @@ public class InterfazRepository {
             session.close();
             return interfazPerson;
         } catch (Exception e) {
-
             System.err.println(e.getMessage());
             /*esto lo hago para que en caso de que estallara le envie un objeto y no devuelva null como si 
               no hubiera encontrado nada en la base de datos por que alomejor en la base
@@ -55,6 +55,22 @@ public class InterfazRepository {
 
     }
 
+    @SuppressWarnings("deprecation")
+    public void updateInterfaz(InterfazDTO interfazDTO){
+        Session session = null;
+        try {
+            session = HibernateUtil.getSession();
+            session.beginTransaction();
+            session.update(interfazDTO);;
+            session.getTransaction().commit();
+            session.close();
+            
+        } catch (Exception e) {
+          e.printStackTrace();
+        }finally{
+            session.close();
+        }
+    }
 
 
 
@@ -122,7 +138,7 @@ public class InterfazRepository {
         }
     }
 
-
+   @SuppressWarnings("deprecation")
 
 
     public InterfazDTO haveJsonWithPart(PartsDTO partsDTO,String codprov){
@@ -283,7 +299,6 @@ public InterfazDTO haveJsonWithVehicle(VehicleDTO vehicleDTO,String codprov){
                 session.beginTransaction();
                 session.save(interfazDTO);
                 session.getTransaction().commit();
-                session.close();
             }
             //en caso de que este pero el json sea diferente lo actualizas
             if (operation==Constants.UPD) {
@@ -300,8 +315,8 @@ public InterfazDTO haveJsonWithVehicle(VehicleDTO vehicleDTO,String codprov){
                 session.beginTransaction();
                 session.update(interfazDTO);;
                 session.getTransaction().commit();
-                session.close();
             }
+            session.close();
            
         } catch (Exception e) {
            e.printStackTrace();
@@ -326,7 +341,7 @@ public InterfazDTO haveJsonWithVehicle(VehicleDTO vehicleDTO,String codprov){
             .setParameter("DNI", dni)
             .setParameter("CODPROV", codprov)
             .uniqueResult();
-            
+            session.close();
 
             if (interfazdDto==null) { return null; }//control de errores por si no lo encuentra
             Boolean isEquals = jsonToTheFile.equals(interfazdDto.getcontJson());
@@ -346,4 +361,23 @@ public InterfazDTO haveJsonWithVehicle(VehicleDTO vehicleDTO,String codprov){
 
     }
 
+
+
+    public List<InterfazDTO> getRecordsWithStatusInN(String source){
+        Session session = null;
+        try {
+            session = HibernateUtil.getSession();
+            return session.createQuery("from mm_interface where resource = :RESOURCE and statusProcess='N'",InterfazDTO.class)
+           .setParameter("RESOURCE", source)
+           .list();
+          
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            return null;
+        }finally{
+            session.close();
+        }
+
+     
+    }
 }

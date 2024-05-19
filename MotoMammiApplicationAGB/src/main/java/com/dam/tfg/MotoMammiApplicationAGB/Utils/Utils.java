@@ -23,7 +23,14 @@ public class Utils {
 
   public static Date stringToSqlDate(String date){
     try {
-    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      SimpleDateFormat dateFormat=null;
+      if (date.contains("/")) {
+        dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+      }
+      if (date.contains("-")&& date.contains("T")) {
+        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+      }
+    
     java.util.Date parsedDate;
       parsedDate = dateFormat.parse(date);
       return new Date(parsedDate.getTime());
@@ -32,5 +39,7 @@ public class Utils {
       return null;
     }
   }
+
+
 
 }

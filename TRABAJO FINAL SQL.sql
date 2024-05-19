@@ -4,15 +4,16 @@ use mm_agb;
 
 
 CREATE TABLE MM_PROVIDERS (
-    id VARCHAR(250) primary KEY,
-    codigoProveedor VARCHAR(250) ,
+    id VARCHAR(250) ,
+    codigoProveedor VARCHAR(250) primary KEY ,
     name VARCHAR(250),
     dateIni DATE,
     dateEnd DATE,
     swiact INT
 );
 
--- Primera tabla 
+
+
 CREATE TABLE MM_INTERFACE (
     id VARCHAR(250) PRIMARY KEY,
     idProv varchar(250) ,  
@@ -27,29 +28,17 @@ CREATE TABLE MM_INTERFACE (
     errorMessage VARCHAR(4000),
     statusProcess VARCHAR(10),   -- STATUS PROCCES N-> nO HA SIDO PROCESADO, E, P 
     operation VARCHAR(250),  --  New, Update   -- N -> no ha sido procesado  -- E-->  -- P--> Procesado
-    resource VARCHAR(20)
+    resource VARCHAR(20),
+    FOREIGN KEY (codProv) REFERENCES MM_PROVIDERS(codigoProveedor)
 );
 
-
--- Esta tabla pretende traducir cosas como la calle de los customer (en la clase estan los atributos que tenemos que comprobar)
-CREATE TABLE MM_TRANSLATION (
-id int,
-idProv varchar(250), -- con lo que buscar
-cod_ext varchar(250), -- como le llega desde el json ej: Rojo
-cod_int varchar(250), -- como debe salir -> Red
-date_ini date,
-date_end date,
-FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)    -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
-
-);
 
 
 
 -- CREATE TABLE CUSTOMERS
-CREATE TABLE IF NOT EXISTS MM_CUSTOMER (
+CREATE TABLE MM_CUSTOMER (
     DNI VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100),
-    first_surname VARCHAR(100),
     first_surname VARCHAR(100),
     last_surname VARCHAR(100),
     email VARCHAR(100),
@@ -60,8 +49,7 @@ CREATE TABLE IF NOT EXISTS MM_CUSTOMER (
     number VARCHAR(20),
     phone VARCHAR(20),
     gender varchar(20),
-    licence_type VARCHAR(50),
-    operation VARCHAR(10)
+    licence_type VARCHAR(50)
 );
 
 -- PARTS
@@ -101,37 +89,70 @@ FOREIGN KEY (dniUsuario) REFERENCES MM_CUSTOMER(DNI)
 
 
 
+-- Esta tabla pretende traducir cosas como la calle de los customer (en la clase estan los atributos que tenemos que comprobar)
+CREATE TABLE MM_TRANSLATION_AUX (
+id int PRIMARY KEY auto_increment,
+idProv varchar(250), -- con lo que buscar
+cod_ext varchar(250), -- como le llega desde el json ej: Rojo
+cod_int varchar(250), -- como debe salir -> Red
+date_ini date,
+date_end date,
+FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)    -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
+);
+
+
+
+-- insert EXAMPLE 
+INSERT INTO MM_PROVIDERS (id, codigoProveedor, name, dateIni, dateEnd, swiact) VALUES
+('1', 'CAIX', 'La Caixa', '2022-01-01', '2028-12-31', 1),
+('2', 'BBVA', 'BBVA', '2022-01-01', '2028-12-31', 1),
+('3', 'ING', 'ING', '2022-01-01', '2028-12-31', 1);
+
+
+-- CAIXA
+INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VALUES
+('CAIX', 'plaza', 'Square', '2022-01-01', '2028-12-31'),
+('CAIX', 'calle', 'Street', '2022-01-01', '2028-12-31'),
+('CAIX', 'hombre', 'Male', '2022-01-01', '2028-12-31'),
+('CAIX', 'mujer', 'Female', '2022-01-01', '2028-12-31'),
+('CAIX', 'm', 'Male', '2022-01-01', '2028-12-31'),
+('CAIX', 'f', 'Female', '2022-01-01', '2028-12-31'),
+('CAIX', 'h', 'Male', '2022-01-01', '2028-12-31'),
+('CAIX', 'm', 'Female', '2022-01-01', '2028-12-31'),
+('CAIX', 'palma', 'Palma', '2022-01-01', '2028-12-31'),
+('CAIX', 'londres', 'London', '2022-01-01', '2028-12-31'),
+('CAIX', 'madrid', 'Madrid', '2022-01-01', '2028-12-31'),
+('CAIX', 'b', 'Class B', '2022-01-01', '2028-12-31'),
+('CAIX', 'a', 'Class A', '2022-01-01', '2028-12-31'),
+('CAIX', 'a1', 'Class A1', '2022-01-01', '2028-12-31'),
+('CAIX', 'a2', 'Class A2', '2022-01-01', '2028-12-31');
 
 
 
 
+-- BBVA
+INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VALUES
+('BBVA', 'plaza', 'Sq', '2022-01-01', '2022-12-31'),
+('BBVA', 'calle', 'St', '2022-01-01', '2022-12-31'),
+('BBVA', 'hombre', 'Male', '2022-01-01', '2022-12-31'),
+('BBVA', 'mujer', 'Female', '2022-01-01', '2022-12-31'),
+('BBVA', 'm', 'Male', '2022-01-01', '2022-12-31'),
+('BBVA', 'f', 'Female', '2022-01-01', '2022-12-31'),
+('BBVA', 'h', 'Male', '2022-01-01', '2022-12-31'),
+('BBVA', 'm', 'Female', '2022-01-01', '2022-12-31'),
+('BBVA', 'palma', 'PMI', '2022-01-01', '2022-12-31'),
+('BBVA', 'londres', 'LHR', '2022-01-01', '2022-12-31'),
+('BBVA', 'madrid', 'MAD', '2022-01-01', '2022-12-31'),
+('BBVA', 'b', 'Class B', '2022-01-01', '2022-12-31'),
+('BBVA', 'a', 'Class A', '2022-01-01', '2022-12-31'),
+('BBVA', 'a1', 'Class A1', '2022-01-01', '2022-12-31'),
+('BBVA', 'a2', 'Class A2', '2022-01-01', '2022-12-31');
+
+
+select * from MM_TRANSLATION_AUX
+where idProv='CAIX' and cod_ext ='calle';
 
 
 
 
-
-select * from MM_INTERFACE where codExternal = @DNI;
-
-	
-use mm_agb;
--- Relacion  id de provider -> idProv
-
-Select * from MM_PROVIDERS;
-
-
--- QUERY COMPROBAR PROVIDERS ACTIVOS
-select * from MM_PROVIDERS 
-where swiact = 1
-and ifnull(@param_date,current_date()) BETWEEN dateIni AND ifnull(dateEnd,'2099-12-31')
-and codigoProveedor = ifnull(@p_prov, codigoProveedor);
-
-
-use mm_agb;
-
-select * from MM_PROVIDERS
-where swiact = 1 and ifnull(null,current_date()) BETWEEN dateIni AND ifnull(null,'2099-12-31') and codigoProveedor = ifnull(@p_prov, codigoProveedor);
-
-
-
--- and codigoProveedor = @p_Prov and 
 

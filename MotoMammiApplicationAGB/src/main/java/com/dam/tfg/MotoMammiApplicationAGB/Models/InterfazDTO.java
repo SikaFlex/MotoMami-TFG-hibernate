@@ -283,6 +283,23 @@ public class InterfazDTO {
     public void setContJson(String contJson) {
         this.contJson = contJson;
     }
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public String toString() {
+        return "InterfazDTO [id=" + id + ", idProv=" + idProv + ", codExternal=" + codExternal + ", codProv=" + codProv
+                + ", contJson=" + contJson + ", createDate=" + createDate + ", lastUpdate=" + lastUpdate + ", createBy="
+                + createBy + ", updateBy=" + updateBy + ", codError=" + codError + ", errorMessage=" + errorMessage
+                + ", statusProcess=" + statusProcess + ", operation=" + operation + ", resource=" + resource + "]";
+    }
     
     
 

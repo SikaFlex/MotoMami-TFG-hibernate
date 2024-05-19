@@ -9,7 +9,7 @@ public class PropertiesConfig {
     public static Properties properties = new Properties();
     static {
         try {
-            properties.load(new FileInputStream("C:\\Users\\PONTE PERRO\\Desktop\\MotoMami-TFG-hibernate\\MotoMammiApplicationAGB\\src\\main\\resources\\application.properties"));
+            properties.load(new FileInputStream("MotoMammiApplicationAGB\\src\\main\\resources\\application.properties"));
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("No se encontro el archivo properties");
