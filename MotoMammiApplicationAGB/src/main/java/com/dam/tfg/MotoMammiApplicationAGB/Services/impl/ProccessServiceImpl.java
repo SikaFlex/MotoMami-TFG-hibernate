@@ -27,6 +27,7 @@ import com.dam.tfg.MotoMammiApplicationAGB.Repositories.InterfazRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.PartsRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.TranslationRepository;
+import com.dam.tfg.MotoMammiApplicationAGB.Repositories.VehiclesRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.PropertiesConfig;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.Utils;
@@ -47,7 +48,7 @@ public class ProccessServiceImpl implements ProccessService{
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
         psi.readInfoFile(Constants.VEHICLES,null,null);
-        psi.proccessIntegrateInfo(Constants.PARTS,null,null);
+        // psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
     
     }
 
@@ -78,7 +79,7 @@ public class ProccessServiceImpl implements ProccessService{
             case Constants.CUSTOMER:
              //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
-            CustomerDTO customer;
+            CustomerDTO customer= new CustomerDTO();
             CustomerRepository customerRepository = new CustomerRepository();
             String DNI,name,firstSurname,lastSurname,email,birthDate,postalCode,streetType,city,number,phone,gender,licenceType;
             if (interfazListWithStatusN!=null) {
@@ -131,25 +132,25 @@ public class ProccessServiceImpl implements ProccessService{
 
             case Constants.PARTS:
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.PARTS);
-            PartsDTO parts;
+            PartsDTO parts=new PartsDTO();
             PartsRepository partsRepository = new PartsRepository();
             String id,codigoExterno,internalCod,descripcion,matricula,idInvoice,dniVehicle,dateNotification;
             if (interfazListWithStatusN!=null) {
                 for (InterfazDTO interfazDTO : interfazListWithStatusN) {
                     if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
                     if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
+                    parts = new PartsDTO();
     
                     Map<String, String> partsData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
-                     codigoExterno = partsData.get("codigoExterno");
-                     internalCod = partsData.get("internalCod");
-                     descripcion = partsData.get("descripcion");
-                     matricula = partsData.get("dateNotification");
-                     idInvoice = partsData.get("idInvoice");
-                     dniVehicle = partsData.get("dniVehicle");
-                     dateNotification = partsData.get("dateNotification");
                     //aqui traduciriamos los campos que fueran necesarios pero parts no necesita serlo.
-                    parts = new PartsDTO(codigoExterno, internalCod, descripcion, matricula, idInvoice, dniVehicle, dateNotification);
-                    parts.setId(Utils.randomID()); //le generamos un id;
+                     parts.setId(Utils.randomID()); //le generamos un id;
+                     parts.setCodigoExterno( partsData.get("codigoExterno"));
+                     parts.setInternalCod(partsData.get("internalCod"));
+                     parts.setDescripcion(partsData.get("descripcion"));
+                     parts.setMatricula(partsData.get("matricula"));
+                     parts.setIdInvoice(partsData.get("idInvoice"));
+                     parts.setDniVehicle(partsData.get("dniVehicle"));
+                     parts.setDateNotification(Utils.stringToSqlDate(partsData.get("dateNotification")));
                     
                     //insertamos en la tabla maestra
                     partsRepository.insertPartsToMainTable(parts);
@@ -160,21 +161,49 @@ public class ProccessServiceImpl implements ProccessService{
                     interfazDTO.setContJson(gson.toJson(parts));  
                     //actualizamos el estado con el nuevo json
                     interfazRepository.updateInterfaz(interfazDTO);
-    
-    
                 }
-    
-    
             }
-            
-
-
-
-
-            
                 break;
+            
+            
+            
+            
             case Constants.VEHICLES:
-            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
+            //TODO: TODOOOOOOOO
+            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.VEHICLES);
+            VehicleDTO vehicle= new VehicleDTO();
+             VehiclesRepository vehicleRepository = new VehiclesRepository();
+            if (interfazListWithStatusN!=null) {
+                for (InterfazDTO interfazDTO : interfazListWithStatusN) {
+                    if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
+                    if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
+    
+                    String colorTranslated,color;
+                    Map<String, String> vehicleData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
+
+                        vehicle.setId(Utils.randomID());
+                        vehicle.setMatricula(vehicleData.get("matricula"));
+                        vehicle.setTipoVehiculo(vehicleData.get("tipoVehiculo"));
+                        vehicle.setMarcaVehiculo(vehicleData.get("Chevrolet"));
+                        vehicle.setModelo(vehicleData.get("modelo"));
+                        color = vehicleData.get("color");
+                        //traducimos el color mediante la tabla auxiliar translation
+                        colorTranslated = tr.getTraductionByProvider(color,codProv);
+
+                        color = colorTranslated.equals(Errors.ERROR_TRADUCTION) ? color : colorTranslated;
+                        vehicle.setColor(color);
+                        vehicle.setDniUsuario(vehicleData.get("dniUsuario"));
+
+                    //guarda vehiculo en tabla maestra
+                    vehicleRepository.insertVehicleToMainTable(vehicle);
+                    //actualizar estado interfaz a --> P
+                    interfazDTO.setStatusProcess(Constants.SP_P);
+                    //insertamos el nuevo json con los datos actualizados
+                    interfazDTO.setContJson(gson.toJson(vehicle));  
+                    //actualizamos el estado con el nuevo json
+                    interfazRepository.updateInterfaz(interfazDTO);
+                }
+            }
                 break;
 
             default:

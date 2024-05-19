@@ -75,8 +75,8 @@ fechaCobro DATE
 
 -- VEHICLES
 CREATE TABLE MM_VEHICLES (
-id varchar(100) PRIMARY KEY,
-matricula varchar(100),  
+id varchar(100) unique,
+matricula varchar(100) PRIMARY KEY,  
 tipoVehiculo varchar(100),
 marcaVehiculo varchar(100),
 modelo varchar(100),
@@ -92,11 +92,12 @@ FOREIGN KEY (dniUsuario) REFERENCES MM_CUSTOMER(DNI)
 -- Esta tabla pretende traducir cosas como la calle de los customer (en la clase estan los atributos que tenemos que comprobar)
 CREATE TABLE MM_TRANSLATION_AUX (
 id int PRIMARY KEY auto_increment,
-idProv varchar(250), -- con lo que buscar
-cod_ext varchar(250), -- como le llega desde el json ej: Rojo
+idProv varchar(250) , -- con lo que buscar
+cod_ext varchar(250) , -- como le llega desde el json ej: Rojo UNIQUE: es para que no se repitan las palabras y pueda dar a problemas a la hora de hacer la query
 cod_int varchar(250), -- como debe salir -> Red
 date_ini date,
 date_end date,
+UNIQUE (idprov, cod_ext), -- para que la misma palabra no este dos veces en el mismo proveedor
 FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)    -- Se traduce por cada provider es decir tiene que tener tambien los campos de customer a traducir
 );
 
@@ -118,10 +119,15 @@ INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VA
 ('CAIX', 'm', 'Male', '2022-01-01', '2028-12-31'),
 ('CAIX', 'f', 'Female', '2022-01-01', '2028-12-31'),
 ('CAIX', 'h', 'Male', '2022-01-01', '2028-12-31'),
-('CAIX', 'm', 'Female', '2022-01-01', '2028-12-31'),
 ('CAIX', 'palma', 'Palma', '2022-01-01', '2028-12-31'),
 ('CAIX', 'londres', 'London', '2022-01-01', '2028-12-31'),
 ('CAIX', 'madrid', 'Madrid', '2022-01-01', '2028-12-31'),
+('CAIX', 'rojo', 'Red', '2022-01-01', '2028-12-31'),
+('CAIX', 'azul', 'Blue', '2022-01-01', '2028-12-31'),
+('CAIX', 'verde', 'Green', '2022-01-01', '2028-12-31'),
+('CAIX', 'gris', 'Gray', '2022-01-01', '2028-12-31'),
+('CAIX', 'negro', 'Black', '2022-01-01', '2028-12-31'),
+('CAIX', 'blanco', 'White', '2022-01-01', '2028-12-31'),
 ('CAIX', 'b', 'Class B', '2022-01-01', '2028-12-31'),
 ('CAIX', 'a', 'Class A', '2022-01-01', '2028-12-31'),
 ('CAIX', 'a1', 'Class A1', '2022-01-01', '2028-12-31'),
@@ -132,22 +138,26 @@ INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VA
 
 -- BBVA
 INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VALUES
-('BBVA', 'plaza', 'Sq', '2022-01-01', '2022-12-31'),
-('BBVA', 'calle', 'St', '2022-01-01', '2022-12-31'),
-('BBVA', 'hombre', 'Male', '2022-01-01', '2022-12-31'),
-('BBVA', 'mujer', 'Female', '2022-01-01', '2022-12-31'),
-('BBVA', 'm', 'Male', '2022-01-01', '2022-12-31'),
-('BBVA', 'f', 'Female', '2022-01-01', '2022-12-31'),
-('BBVA', 'h', 'Male', '2022-01-01', '2022-12-31'),
-('BBVA', 'm', 'Female', '2022-01-01', '2022-12-31'),
-('BBVA', 'palma', 'PMI', '2022-01-01', '2022-12-31'),
-('BBVA', 'londres', 'LHR', '2022-01-01', '2022-12-31'),
-('BBVA', 'madrid', 'MAD', '2022-01-01', '2022-12-31'),
-('BBVA', 'b', 'Class B', '2022-01-01', '2022-12-31'),
-('BBVA', 'a', 'Class A', '2022-01-01', '2022-12-31'),
-('BBVA', 'a1', 'Class A1', '2022-01-01', '2022-12-31'),
-('BBVA', 'a2', 'Class A2', '2022-01-01', '2022-12-31');
-
+('BBVA', 'calle', 'Street', '2022-01-01', '2028-12-31'),
+('BBVA', 'plaza', 'Square', '2022-01-01', '2028-12-31'),
+('BBVA', 'hombre', 'Male', '2022-01-01', '2028-12-31'),
+('BBVA', 'mujer', 'Female', '2022-01-01', '2028-12-31'),
+('BBVA', 'm', 'Male', '2022-01-01', '2028-12-31'),
+('BBVA', 'f', 'Female', '2022-01-01', '2028-12-31'),
+('BBVA', 'h', 'Male', '2022-01-01', '2028-12-31'),
+('BBVA', 'palma', 'Palma', '2022-01-01', '2028-12-31'),
+('BBVA', 'londres', 'London', '2022-01-01', '2028-12-31'),
+('BBVA', 'madrid', 'Madrid', '2022-01-01', '2028-12-31'),
+('BBVA', 'rojo', 'Red', '2022-01-01', '2028-12-31'),
+('BBVA', 'azul', 'Blue', '2022-01-01', '2028-12-31'),
+('BBVA', 'verde', 'Green', '2022-01-01', '2028-12-31'),
+('BBVA', 'gris', 'Gray', '2022-01-01', '2028-12-31'),
+('BBVA', 'negro', 'Black', '2022-01-01', '2028-12-31'),
+('BBVA', 'blanco', 'White', '2022-01-01', '2028-12-31'),
+('BBVA', 'b', 'Class B', '2022-01-01', '2028-12-31'),
+('BBVA', 'a', 'Class A', '2022-01-01', '2028-12-31'),
+('BBVA', 'a1', 'Class A1', '2022-01-01', '2028-12-31'),
+('BBVA', 'a2', 'Class A2', '2022-01-01', '2028-12-31');
 
 
 
@@ -160,6 +170,8 @@ select * from MM_TRANSLATION_AUX
 where idProv='CAIX' and cod_ext ='calle';
 
 
-
+-- RESET STATUS PROCCESS
+UPDATE mm_interface
+SET statusProcess = 'N';
 
 

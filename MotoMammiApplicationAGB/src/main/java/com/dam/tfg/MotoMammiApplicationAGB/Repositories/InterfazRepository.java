@@ -127,7 +127,7 @@ public class InterfazRepository {
                 interfazDTO.setCreateDate(objectOfDataBase.getCreateDate());
                 interfazDTO.setLastUpdate(Utils.timeNow());
                 interfazDTO.setUpdateBy(PropertiesConfig.APP_NAME); //UpdateBy -> NOMBRE DE APLICACION
-
+                interfazDTO.setStatusProcess(Constants.SP_N); // -->status process otra vez a N para que se pueda volver actualizar en la tabla maestra
                 session.beginTransaction();
                 session.update(interfazDTO);;
                 session.getTransaction().commit();
