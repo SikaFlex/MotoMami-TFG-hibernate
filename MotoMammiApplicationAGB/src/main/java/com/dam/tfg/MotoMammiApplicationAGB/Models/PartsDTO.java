@@ -20,8 +20,6 @@ public class PartsDTO {
     private String dniVehicle;
     private Date dateNotification;
 
-
-
     
     public PartsDTO() {
     }

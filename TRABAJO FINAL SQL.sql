@@ -149,6 +149,13 @@ INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VA
 ('BBVA', 'a2', 'Class A2', '2022-01-01', '2022-12-31');
 
 
+
+
+-- VEHICLES
+INSERT INTO mm_vehicles (id, matricula, tipoVehiculo,marcaVehiculo,modelo,color,dniUsuario)
+VALUES					(1111,'ABC1234','Coche','Toyota','Corolla','Rojo','07178855S');
+
+
 select * from MM_TRANSLATION_AUX
 where idProv='CAIX' and cod_ext ='calle';
 

@@ -24,6 +24,7 @@ import com.dam.tfg.MotoMammiApplicationAGB.Models.Translation;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.CustomerRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.InterfazRepository;
+import com.dam.tfg.MotoMammiApplicationAGB.Repositories.PartsRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.TranslationRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Utils.HibernateUtil;
@@ -45,8 +46,8 @@ public class ProccessServiceImpl implements ProccessService{
     public static void main(String[] args) {
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
-        psi.readInfoFile("CUS",null,null);
-        psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
+        psi.readInfoFile(Constants.VEHICLES,null,null);
+        psi.proccessIntegrateInfo(Constants.PARTS,null,null);
     
     }
 
@@ -73,13 +74,14 @@ public class ProccessServiceImpl implements ProccessService{
         Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
         TranslationRepository tr = new TranslationRepository();
         switch (source) {
+
             case Constants.CUSTOMER:
              //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
             CustomerDTO customer;
             CustomerRepository customerRepository = new CustomerRepository();
             String DNI,name,firstSurname,lastSurname,email,birthDate,postalCode,streetType,city,number,phone,gender,licenceType;
-
+            if (interfazListWithStatusN!=null) {
             //serializar el objeto ya sea cutomer
             for (InterfazDTO interfazDTO : interfazListWithStatusN) {
                 if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
@@ -118,21 +120,58 @@ public class ProccessServiceImpl implements ProccessService{
                 interfazRepository.updateInterfaz(interfazDTO);
 
 
-
             }
-           
-           
-            
-           
-
+              
+        }
+        
             //una vez lo tenga serializado tengo que la traduccion EXTERNAL_COD --> MM_TRANSLATION  traducciendo por ejemplo street type
             //insertar en las tablas maestras ya sea mm_customer...
             //y una vez ejecutado la insercion actualizamos el statusprocess en la tabla interfaz con el valor P = procesado
                 break;
 
             case Constants.PARTS:
-            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
+            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.PARTS);
+            PartsDTO parts;
+            PartsRepository partsRepository = new PartsRepository();
+            String id,codigoExterno,internalCod,descripcion,matricula,idInvoice,dniVehicle,dateNotification;
+            if (interfazListWithStatusN!=null) {
+                for (InterfazDTO interfazDTO : interfazListWithStatusN) {
+                    if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
+                    if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
+    
+                    Map<String, String> partsData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
+                     codigoExterno = partsData.get("codigoExterno");
+                     internalCod = partsData.get("internalCod");
+                     descripcion = partsData.get("descripcion");
+                     matricula = partsData.get("dateNotification");
+                     idInvoice = partsData.get("idInvoice");
+                     dniVehicle = partsData.get("dniVehicle");
+                     dateNotification = partsData.get("dateNotification");
+                    //aqui traduciriamos los campos que fueran necesarios pero parts no necesita serlo.
+                    parts = new PartsDTO(codigoExterno, internalCod, descripcion, matricula, idInvoice, dniVehicle, dateNotification);
+                    parts.setId(Utils.randomID()); //le generamos un id;
+                    
+                    //insertamos en la tabla maestra
+                    partsRepository.insertPartsToMainTable(parts);
+    
+                    //actualizar estado interfaz a --> P
+                    interfazDTO.setStatusProcess(Constants.SP_P);
+                    //insertamos el nuevo json con los datos actualizados
+                    interfazDTO.setContJson(gson.toJson(parts));  
+                    //actualizamos el estado con el nuevo json
+                    interfazRepository.updateInterfaz(interfazDTO);
+    
+    
+                }
+    
+    
+            }
+            
 
+
+
+
+            
                 break;
             case Constants.VEHICLES:
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);

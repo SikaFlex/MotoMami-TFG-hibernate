@@ -91,6 +91,7 @@ public class InterfazRepository {
 
             ProviderDTO provider = providerRepository.getProviderByCodProv(codprov);
             InterfazDTO interfazDTO = new InterfazDTO();
+            partsDTO.setId(Utils.randomID());//le añadimos un id
             //convertir customerDTO en un json
             String objectJson = gson.toJson(partsDTO);
             
