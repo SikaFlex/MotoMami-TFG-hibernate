@@ -169,7 +169,6 @@ public class ProccessServiceImpl implements ProccessService{
             
             
             case Constants.VEHICLES:
-            //TODO: TODOOOOOOOO
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.VEHICLES);
             VehicleDTO vehicle= new VehicleDTO();
              VehiclesRepository vehicleRepository = new VehiclesRepository();
@@ -206,8 +205,6 @@ public class ProccessServiceImpl implements ProccessService{
             }
                 break;
 
-            default:
-                break;
         }
 
 
@@ -251,15 +248,15 @@ public class ProccessServiceImpl implements ProccessService{
                     //tienes que leer los 3 archivos
                     switch (source) {
                         case Constants.CUSTOMER:
-                        readFile(customerFile,Constants.CUSTOMER, codProvActivo);
+                        readFileAndInsertToInterfaz(customerFile,Constants.CUSTOMER, codProvActivo);
                         break;
 
                         case Constants.VEHICLES:
-                        readFile(vehicleFile,Constants.VEHICLES, codProvActivo);
+                        readFileAndInsertToInterfaz(vehicleFile,Constants.VEHICLES, codProvActivo);
                         break;
 
                         case Constants.PARTS:
-                        readFile(partFile,Constants.PARTS, codProvActivo);
+                        readFileAndInsertToInterfaz(partFile,Constants.PARTS, codProvActivo);
                         break;
 
                     }
@@ -276,7 +273,7 @@ public class ProccessServiceImpl implements ProccessService{
         }
     }
     
-    private void readFile(String pathCompost, String constants,String codprov ){
+    private void readFileAndInsertToInterfaz(String pathCompost, String constants,String codprov ){
         try {
             InterfazRepository interfazRepository = new InterfazRepository();
             BufferedReader br = new BufferedReader(new FileReader(new File(pathCompost)));

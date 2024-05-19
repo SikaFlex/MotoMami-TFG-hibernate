@@ -35,7 +35,7 @@ CREATE TABLE MM_INTERFACE (
 
 
 
--- CREATE TABLE CUSTOMERS
+-- CUSTOMERS
 CREATE TABLE MM_CUSTOMER (
     DNI VARCHAR(20) PRIMARY KEY,
     name VARCHAR(100),
@@ -65,7 +65,7 @@ dniVehicle varchar(100),
 FOREIGN KEY (dniVehicle) REFERENCES MM_VEHICLES(dniUsuario)
 );
 
--- INVOICE (FACTURAS)
+-- INVOICE 
 CREATE TABLE MM_INVOICES(
 id varchar(100) PRIMARY KEY,
 DNI varchar(9), -- REFERENCIA A LA TABLA CUSTOMER
@@ -103,7 +103,7 @@ FOREIGN KEY (idProv) REFERENCES MM_PROVIDERS(codigoProveedor)    -- Se traduce p
 
 
 
--- insert EXAMPLE 
+-- ------------------------------------------------------------- insert EXAMPLE & Tools-------------------------------------------------------------------------
 INSERT INTO MM_PROVIDERS (id, codigoProveedor, name, dateIni, dateEnd, swiact) VALUES
 ('1', 'CAIX', 'La Caixa', '2022-01-01', '2028-12-31', 1),
 ('2', 'BBVA', 'BBVA', '2022-01-01', '2028-12-31', 1),
@@ -165,9 +165,6 @@ INSERT INTO MM_TRANSLATION_AUX (idProv, cod_ext, cod_int, date_ini, date_end) VA
 INSERT INTO mm_vehicles (id, matricula, tipoVehiculo,marcaVehiculo,modelo,color,dniUsuario)
 VALUES					(1111,'ABC1234','Coche','Toyota','Corolla','Rojo','07178855S');
 
-
-select * from MM_TRANSLATION_AUX
-where idProv='CAIX' and cod_ext ='calle';
 
 
 -- RESET STATUS PROCCESS
