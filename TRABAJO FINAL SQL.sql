@@ -59,19 +59,13 @@ codigoExterno varchar(100),
 internalCod varchar(100),
 descripcion varchar(100),
 dateNotification date,
-matricula varchar(100),
+matricula varchar(100) ,
 idInvoice varchar(100),
 dniVehicle varchar(100),
-FOREIGN KEY (dniVehicle) REFERENCES MM_VEHICLES(dniUsuario)
+FOREIGN KEY (dniVehicle) REFERENCES MM_VEHICLES(dniUsuario),
+FOREIGN KEY (codigoExterno) REFERENCES MM_VEHICLES(matricula) -- > EL CODIGO EXTERNO ES LA MATRICULA DEL VEHICULO YA QUE ES UNICO NO SE VA A DAR ESTEN DOS MATRICULAS EN UNA ASEGURADORA
 );
 
--- INVOICE 
-CREATE TABLE MM_INVOICES(
-id varchar(100) PRIMARY KEY,
-DNI varchar(9), -- REFERENCIA A LA TABLA CUSTOMER
-matricula varchar(200), -- REFERENCIA A LA TABLA VEHICLES
-fechaCobro DATE
-);
 
 -- VEHICLES
 CREATE TABLE MM_VEHICLES (
@@ -86,6 +80,20 @@ FOREIGN KEY (dniUsuario) REFERENCES MM_CUSTOMER(DNI)
 );
 
 
+
+-- INVOICE 
+CREATE TABLE MM_INVOICES(
+id varchar(200) PRIMARY KEY,
+codProv varchar(200),
+dni_Cliente varchar(200),
+fecha_emision date,
+nombreEmpresa varchar(200),
+cifEmpresa varchar(200),
+direccionEmpresa varchar(200),
+coste double,
+divisa varchar(200),
+iva int
+);
 
 
 
@@ -172,3 +180,10 @@ UPDATE mm_interface
 SET statusProcess = 'N';
 
 
+-- INVOICE
+INSERT INTO mm_agb.mm_invoices (
+    id, codProv, dni_Cliente, fecha_emision, nombreEmpresa, cifEmpresa, direccionEmpresa, coste, divisa, iva
+)
+VALUES (
+    '12', 'CAIX', '07178855S', '2024-05-20', 'pepinosRamon', '44444444B', 'C/ Gremi fuster 3 Sotano derecha', 300, '€', 21
+);

@@ -12,6 +12,7 @@ import org.hibernate.cfg.Configuration;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.InvoiceDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.Translation;
@@ -29,6 +30,7 @@ public class HibernateUtil {
 		configuration.addAnnotatedClass(PartsDTO.class);
 		configuration.addAnnotatedClass(Translation.class);
 		configuration.addAnnotatedClass(CustomerDTO.class);
+		configuration.addAnnotatedClass(InvoiceDTO.class);
 		// configuration.addAnnotatedClass(Users_cide.class); InterfazDTO
 
 		StandardServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()

@@ -34,7 +34,7 @@ public class Constants {
     public final static String SP_P = "P";
 
 
-
+    public final static String UNDERSCORE ="_";
 
     public final static String path = ".dat";
 

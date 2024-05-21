@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.UUID;
 
 public class Utils {
@@ -39,6 +40,18 @@ public class Utils {
       return null;
     }
   }
+
+  public static Date getLastMonth(Date date) {
+    try {
+      Calendar calendar = Calendar.getInstance();
+      calendar.setTime(date);
+      calendar.add(Calendar.MONTH, -1);
+      return new Date(calendar.getTimeInMillis());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+}
 
 
 

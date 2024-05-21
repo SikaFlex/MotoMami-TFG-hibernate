@@ -1,9 +1,11 @@
 package com.dam.tfg.MotoMammiApplicationAGB.Services.impl;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 
@@ -18,12 +20,15 @@ import org.hibernate.Session;
 
 import com.dam.tfg.MotoMammiApplicationAGB.Models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.InterfazDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.InvoiceDTO;
+import com.dam.tfg.MotoMammiApplicationAGB.Models.InvoiceDataToPrintDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.ProviderDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.Translation;
 import com.dam.tfg.MotoMammiApplicationAGB.Models.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.CustomerRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.InterfazRepository;
+import com.dam.tfg.MotoMammiApplicationAGB.Repositories.InvoiceRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.PartsRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationAGB.Repositories.TranslationRepository;
@@ -47,8 +52,13 @@ public class ProccessServiceImpl implements ProccessService{
     public static void main(String[] args) {
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
-        psi.readInfoFile(Constants.VEHICLES,null,null);
+        // psi.readInfoFile(Constants.CUSTOMER,null,null);
+        // psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
+        //  psi.readInfoFile(Constants.VEHICLES,null,null);
         // psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
+        //  psi.readInfoFile(Constants.PARTS,null,null);
+        // psi.proccessIntegrateInfo(Constants.PARTS,null,null);
+        psi.voidGenerateInvoice("CAIX",null);
     
     }
 
@@ -56,15 +66,60 @@ public class ProccessServiceImpl implements ProccessService{
     //TERCER PROCESO 1 VEZ AL MES
     @Override
     public void voidGenerateInvoice(String codProv, String date) {
-        /*
-         * RF4.2 Las facturas contendrán los campos de id, fecha, nombre empresa, cif empresa (41256985632), 
-         * dirección de la empresa (C/ Vergel, 5 Madrid, 28080), nombre usuario, apellidos usuario, dirección usuario, 
-         * tipo seguro, tipo de vehículo, fecha de registro,
-         *  fecha de fin de contrato (un año de duración), coste, iva (21% sobre el precio).
-         *   RF4.2-AD. La aplicación tendrá un proceso mensual que se lanzará el primer día de cada mes y genera un fichero con todas
-         *  las facturas del mes anterior(nombre fichero “MM_invoices_CODPROV_YYYYMM.csv”). Para que un proveedor firme digitalmente las facturas.
-         */
-       //GENERA UN ARCHIVO CON TODAS LAS FACTURA DE UN USUARIO
+        try {
+            Date dateNow = new Date();                                                                      //en caso de que no mande nada buscara por el mes
+            InvoiceRepository invoiceRepository = new InvoiceRepository();
+            CustomerRepository customerRepository = new CustomerRepository();
+            VehiclesRepository vehiclesRepository = new VehiclesRepository();
+            
+            java.sql.Date dateFinally = date !=null ? Utils.stringToSqlDate(date) : Utils.getLastMonth(new java.sql.Date(System.currentTimeMillis()));
+            date=new SimpleDateFormat("yyyyMM").format(new Date()).toString();
+  
+            String path= PropertiesConfig.PATH + PropertiesConfig.INVOICE_PATH_FILE + codProv + Constants.UNDERSCORE + date + PropertiesConfig.INVOICE_FORMAT;
+    
+            BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
+            
+            List<InvoiceDTO> invoicesList = invoiceRepository.getInvoiceFromUntilToday(codProv,dateFinally);
+            CustomerDTO customer;
+            VehicleDTO vehicle; 
+            InvoiceDataToPrintDTO invoiceDataToPrintDTO = new InvoiceDataToPrintDTO();
+            
+             
+            String dni;
+            //INVOICE
+            //CON LAS FACTURAS DEL MES ANTERIOR?
+            if (invoicesList == null) { return;}
+            bw.write(invoiceDataToPrintDTO.firtsLineCSV());
+            for (InvoiceDTO invoiceDTO : invoicesList) {
+                //esto se podria hacer con INNER JOIN pero Hibernate las relaciones 1-M etc... ya tu sabe.
+                dni = invoiceDTO.getDni_Cliente();
+                customer=customerRepository.getCustomerByDNI(dni);
+                vehicle= vehiclesRepository.getVehicleByDNI(dni);
+
+                invoiceDataToPrintDTO.setDNI(dni);
+                invoiceDataToPrintDTO.setCodProv(codProv);
+                invoiceDataToPrintDTO.setFecha_emision(dateFinally);
+                invoiceDataToPrintDTO.setNombre(customer.getName());
+                invoiceDataToPrintDTO.setFirt_Surname(customer.getFirst_surname());
+                invoiceDataToPrintDTO.setLast_Surname(customer.getLast_surname());
+                invoiceDataToPrintDTO.setDireccion(invoiceDTO.getDireccionEmpresa());
+                invoiceDataToPrintDTO.setTipoDeVehiculo(vehicle.getTipoVehiculo());
+                invoiceDataToPrintDTO.setMatricula(vehicle.getMatricula());
+                invoiceDataToPrintDTO.setNombreEmpresa(invoiceDTO.getNombreEmpresa());
+                invoiceDataToPrintDTO.setCifEmpresa(invoiceDTO.getCifEmpresa());
+                //TODO: PULIRRRRRRRRRR
+                invoiceDataToPrintDTO.setCoste(invoiceDTO.getCoste()*invoiceDTO.getIva());
+                invoiceDataToPrintDTO.setDivisa(invoiceDTO.getDivisa());
+                bw.write(invoiceDataToPrintDTO.printCSV());
+
+
+            }
+            bw.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+            
     }
 
       //SEGUNDO PROCESO
@@ -183,7 +238,7 @@ public class ProccessServiceImpl implements ProccessService{
                         vehicle.setId(Utils.randomID());
                         vehicle.setMatricula(vehicleData.get("matricula"));
                         vehicle.setTipoVehiculo(vehicleData.get("tipoVehiculo"));
-                        vehicle.setMarcaVehiculo(vehicleData.get("Chevrolet"));
+                        vehicle.setMarcaVehiculo(vehicleData.get("marcaVehiculo"));
                         vehicle.setModelo(vehicleData.get("modelo"));
                         color = vehicleData.get("color");
                         //traducimos el color mediante la tabla auxiliar translation
@@ -229,20 +284,21 @@ public class ProccessServiceImpl implements ProccessService{
                 String vehicleFile;
                 String partFile;
                 String customerFile;
+                String underscore ="_";
                 List<ProviderDTO> listaProveedoresActivos; 
               
                 //devolvera los proveedores activos que tenga el mismo codProv, si es null devolvera todos
                 listaProveedoresActivos = PR.getAllUsersPovidersActive(codProv, dateFile);
-               
-                //recorremos los proveedores activos
-                for (ProviderDTO proveedor : listaProveedoresActivos) {
+               if (codProv==null) {
+                 //recorremos los proveedores activos
+                 for (ProviderDTO proveedor : listaProveedoresActivos) {
                     // Recuperamos el código del proveedor
                     String codProvActivo = proveedor.getCodigoProveedor();
                     
                     //buscar archivo con estos nombres por cada proveedor
-                    customerFile= PropertiesConfig.PATH + PropertiesConfig.CUSTOMER_PATH_FILE + codProvActivo + dateFile + PropertiesConfig.FORMAT;
-                    vehicleFile= PropertiesConfig.PATH + PropertiesConfig.VEHICLE_PATH_FILE + codProvActivo + dateFile + PropertiesConfig.FORMAT;
-                    partFile= PropertiesConfig.PATH + PropertiesConfig.PARTS_PATH_FILE +  codProvActivo + dateFile + PropertiesConfig.FORMAT;
+                    customerFile= PropertiesConfig.PATH + PropertiesConfig.CUSTOMER_PATH_FILE + codProvActivo +Constants.UNDERSCORE+ dateFile + PropertiesConfig.FORMAT_DAT;
+                    vehicleFile= PropertiesConfig.PATH + PropertiesConfig.VEHICLE_PATH_FILE + codProvActivo +Constants.UNDERSCORE+ dateFile + PropertiesConfig.FORMAT_DAT;
+                    partFile= PropertiesConfig.PATH + PropertiesConfig.PARTS_PATH_FILE + codProvActivo +Constants.UNDERSCORE+ dateFile + PropertiesConfig.FORMAT_DAT;
                     
                   
                     //tienes que leer los 3 archivos
@@ -260,11 +316,25 @@ public class ProccessServiceImpl implements ProccessService{
                         break;
 
                     }
-                  
-              }                          
-           
-            
-
+                } 
+               }else{
+                
+                switch (source) {
+                    case Constants.CUSTOMER:
+                        source = PropertiesConfig.CUSTOMER_PATH_FILE;
+                        break;
+                    case Constants.VEHICLES:
+                        source = PropertiesConfig.VEHICLE_PATH_FILE;
+                        break;
+                    case Constants.PARTS:
+                        source = PropertiesConfig.PARTS_PATH_FILE;
+                        break;
+                }
+                //String source,String codProv, String date
+                String path= PropertiesConfig.PATH+ source +  codProv + underscore+dateFile + PropertiesConfig.FORMAT_DAT;
+                readFileAndInsertToInterfaz(path, source, codProv);
+               }
+                                        
    
 
         } catch (Exception e) {
@@ -273,7 +343,7 @@ public class ProccessServiceImpl implements ProccessService{
         }
     }
     
-    private void readFileAndInsertToInterfaz(String pathCompost, String constants,String codprov ){
+    private void readFileAndInsertToInterfaz(String pathCompost, String source,String codprov ){
         try {
             InterfazRepository interfazRepository = new InterfazRepository();
             BufferedReader br = new BufferedReader(new FileReader(new File(pathCompost)));
@@ -284,11 +354,11 @@ public class ProccessServiceImpl implements ProccessService{
                  * SE QUITA ESTE CONTROL DE ERRORES POR DECISION PERSONAL YA QUE ES UNA MINA DE BUGS Y COMO ALFINAL ESTO SE PUEDE ACORDAR CON EL CLIENTE
                  * SE DECIDE QUE EL FORMATO SERA SIN LA FILA DE LAS COLUMNAS ARRIBA 
                 */
-                // if (linea.contains(Constants.SKIP_VEHICLE) || linea.contains(Constants.SKIP_CUSTOMER) || linea.contains(Constants.SKIP_PARTS) || linea == null){linea=br.readLine();}
+                // if (linea.contains(source.SKIP_VEHICLE) || linea.contains(source.SKIP_CUSTOMER) || linea.contains(source.SKIP_PARTS) || linea == null){linea=br.readLine();}
                 String[] splitData =linea.split(","); 
                 
     
-                switch (constants) {
+                switch (source) {
 
 
                     case Constants.VEHICLES:
@@ -470,24 +540,27 @@ private boolean isInInterface(String externalCod,String codProv) {
  */
 @SuppressWarnings("deprecation")
 private void insertErrorMessage(Exception e){
+    Session session = null;
     try {
         String errorMessage = e.getMessage()!= null ? e.getMessage() : Errors.UNKNOW_ERROR ; //-> valido que no me meta null
-        Session session = HibernateUtil.getSession();
+        session = HibernateUtil.getSession();
         InterfazDTO interfazDTO = new InterfazDTO();
 
         interfazDTO.setCreateDate(Utils.timeNow());
         interfazDTO.setStatusProcess(Constants.SP_E); //--> StatusProcess: E -> ERROR
         interfazDTO.setCodError(Errors.ERROR_HIBERNATE);//-> dentro del catch de hibernate este es el causante de todos nuestros males
         interfazDTO.setErrorMessage(errorMessage);//--> Mensaje de error
-
+        interfazDTO.setStatusProcess(Constants.SP_E);
         session.beginTransaction();
         session.save(interfazDTO);//Guardamos el objeto
         session.getTransaction().commit();
-        session.close();
+      
         
     } catch (Exception exception) {
        System.err.println(exception.getMessage());
        System.err.println(Errors.UNKNOW_ERROR);//en caso de que estalle tambien esto pues ERROR DESCONOCIDO
+    }finally{
+        if (session!=null) { session.close();} 
     }
 }
  

@@ -39,9 +39,11 @@ public class PropertiesConfig {
     public static final String CUSTOMER_PATH_FILE = properties.getProperty("customer.path.file");
     public static final String VEHICLE_PATH_FILE = properties.getProperty("vehicle.path.file");
     public static final String PARTS_PATH_FILE = properties.getProperty("parts.path.file");
-
+    public static final String INVOICE_PATH_FILE = properties.getProperty("invoice.path.file");
+    
 	public static final String PATH = properties.getProperty("file.path");
-    public static final String FORMAT = properties.getProperty("file.format");
+    public static final String FORMAT_DAT = properties.getProperty("file.format.dat");
+    public static final String INVOICE_FORMAT=properties.getProperty("file.format.csv");
 
 
 
