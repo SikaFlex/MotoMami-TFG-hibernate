@@ -53,10 +53,10 @@ public class ProccessServiceImpl implements ProccessService{
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
         // psi.readInfoFile(Constants.CUSTOMER,null,null);
+        // psi.readInfoFile(Constants.VEHICLES,null,null);
+        // psi.readInfoFile(Constants.PARTS,null,null);
         // psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
-        //  psi.readInfoFile(Constants.VEHICLES,null,null);
         // psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
-        //  psi.readInfoFile(Constants.PARTS,null,null);
         // psi.proccessIntegrateInfo(Constants.PARTS,null,null);
         psi.voidGenerateInvoice("CAIX",null);
     
@@ -86,15 +86,17 @@ public class ProccessServiceImpl implements ProccessService{
             
              
             String dni;
-            //INVOICE
-            //CON LAS FACTURAS DEL MES ANTERIOR?
+            double iva;
+      
+
             if (invoicesList == null) { return;}
-            bw.write(invoiceDataToPrintDTO.firtsLineCSV());
+            bw.write(invoiceDataToPrintDTO.firtsLineCSV()+"\n");
             for (InvoiceDTO invoiceDTO : invoicesList) {
                 //esto se podria hacer con INNER JOIN pero Hibernate las relaciones 1-M etc... ya tu sabe.
                 dni = invoiceDTO.getDni_Cliente();
                 customer=customerRepository.getCustomerByDNI(dni);
                 vehicle= vehiclesRepository.getVehicleByDNI(dni);
+                iva = invoiceDTO.getIva();
 
                 invoiceDataToPrintDTO.setDNI(dni);
                 invoiceDataToPrintDTO.setCodProv(codProv);
@@ -102,16 +104,16 @@ public class ProccessServiceImpl implements ProccessService{
                 invoiceDataToPrintDTO.setNombre(customer.getName());
                 invoiceDataToPrintDTO.setFirt_Surname(customer.getFirst_surname());
                 invoiceDataToPrintDTO.setLast_Surname(customer.getLast_surname());
-                invoiceDataToPrintDTO.setDireccion(invoiceDTO.getDireccionEmpresa());
                 invoiceDataToPrintDTO.setTipoDeVehiculo(vehicle.getTipoVehiculo());
                 invoiceDataToPrintDTO.setMatricula(vehicle.getMatricula());
+                invoiceDataToPrintDTO.setDireccionEmpresa(invoiceDTO.getDireccionEmpresa());
                 invoiceDataToPrintDTO.setNombreEmpresa(invoiceDTO.getNombreEmpresa());
                 invoiceDataToPrintDTO.setCifEmpresa(invoiceDTO.getCifEmpresa());
-                //TODO: PULIRRRRRRRRRR
-                invoiceDataToPrintDTO.setCoste(invoiceDTO.getCoste()*invoiceDTO.getIva());
+                invoiceDataToPrintDTO.setCoste(invoiceDTO.getCoste()*(iva/100)+invoiceDTO.getCoste());
                 invoiceDataToPrintDTO.setDivisa(invoiceDTO.getDivisa());
-                bw.write(invoiceDataToPrintDTO.printCSV());
+                invoiceDataToPrintDTO.setIva(invoiceDTO.getIva());
 
+                bw.write(invoiceDataToPrintDTO.printCSV()+"\n");
 
             }
             bw.close();
@@ -130,7 +132,6 @@ public class ProccessServiceImpl implements ProccessService{
         Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
         TranslationRepository tr = new TranslationRepository();
         switch (source) {
-
             case Constants.CUSTOMER:
              //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
@@ -186,6 +187,7 @@ public class ProccessServiceImpl implements ProccessService{
                 break;
 
             case Constants.PARTS:
+
             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.PARTS);
             PartsDTO parts=new PartsDTO();
             PartsRepository partsRepository = new PartsRepository();
@@ -489,7 +491,7 @@ private void insertPartsToInterfaceTable(String[] splitData,InterfazRepository i
     try {
         PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5],splitData[6]);
         
-         if (!isInInterface(partsDTO.getCodigoExterno(),codprov)) {
+         if (!isInInterface(partsDTO.getId(),codprov)) {
          interfazRepository.insertPartToInterfaz(partsDTO,codprov,Constants.NEW);
          }else if(existJsonAndIsDifferentParts(partsDTO,codprov)){//en caso de ya exista un registo, mirara que el json no sea igual lo actualizara con OPERATION = "UPD" ->update
          interfazRepository.insertPartToInterfaz(partsDTO,codprov,Constants.UPD);//Cambiamos el operation a UPD
