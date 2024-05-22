@@ -52,13 +52,13 @@ public class ProccessServiceImpl implements ProccessService{
     public static void main(String[] args) {
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
-        // psi.readInfoFile(Constants.CUSTOMER,null,null);
-        // psi.readInfoFile(Constants.VEHICLES,null,null);
-        // psi.readInfoFile(Constants.PARTS,null,null);
-        // psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
-        // psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
-        // psi.proccessIntegrateInfo(Constants.PARTS,null,null);
-        psi.voidGenerateInvoice("CAIX",null);
+        psi.readInfoFile(Constants.CUSTOMER,null,null);
+        psi.readInfoFile(Constants.VEHICLES,null,null);
+        psi.readInfoFile(Constants.PARTS,null,null);
+        psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
+        psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
+        psi.proccessIntegrateInfo(Constants.PARTS,null,null);
+        // psi.voidGenerateInvoice("CAIX",null);
     
     }
 
@@ -128,145 +128,19 @@ public class ProccessServiceImpl implements ProccessService{
     @Override
     public void proccessIntegrateInfo(String source,String codProv, String date){
         InterfazRepository interfazRepository = new InterfazRepository();
-        List <InterfazDTO> interfazListWithStatusN;
-        Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
+        List <InterfazDTO> interfazListWithStatusN=new ArrayList<InterfazDTO>();
         TranslationRepository tr = new TranslationRepository();
         switch (source) {
             case Constants.CUSTOMER:
-             //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
-            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
-            CustomerDTO customer= new CustomerDTO();
-            CustomerRepository customerRepository = new CustomerRepository();
-            String DNI,name,firstSurname,lastSurname,email,birthDate,postalCode,streetType,city,number,phone,gender,licenceType;
-            if (interfazListWithStatusN!=null) {
-            //serializar el objeto ya sea cutomer
-            for (InterfazDTO interfazDTO : interfazListWithStatusN) {
-                if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
-                if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
-
-                Map<String, String> customerData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
-                 DNI = customerData.get("DNI");
-                 name = customerData.get("name");
-                 firstSurname = customerData.get("first_surname");
-                 lastSurname = customerData.get("last_surname");
-                 email = customerData.get("email");
-                 birthDate = customerData.get("birth_date");
-                 postalCode = customerData.get("postal_code");
-                 streetType = customerData.get("street_type");
-                 city = customerData.get("city");
-                 number = customerData.get("number");
-                 phone = customerData.get("phone");
-                 gender = customerData.get("gender");
-                 licenceType = customerData.get("licence_type");
-
-                //traducimos a traves de la tabla translation dependiendo del proveedor
-                if (!streetType.isEmpty()) { streetType = tr.getTraductionByProvider(streetType, codProv);}  
-                if (!city.isEmpty()) { city = tr.getTraductionByProvider(city, codProv);}  
-                if (!gender.isEmpty()) { gender = tr.getTraductionByProvider(gender, codProv);} 
-                if (!licenceType.isEmpty()) { licenceType = tr.getTraductionByProvider(licenceType, codProv);} 
-
-                customer = new CustomerDTO(DNI,name,firstSurname,lastSurname,email,birthDate,postalCode,streetType,city,number,phone,gender,licenceType); 
-                customerRepository.insertCustomerToMainTable(customer);
-
-                //actualizar estado interfaz a --> P
-                interfazDTO.setStatusProcess(Constants.SP_P);
-                
-                //insertamos el nuevo json con los datos actualizados
-                interfazDTO.setContJson(gson.toJson(customer));  
-                //actualizamos el estado con el nuevo json
-                interfazRepository.updateInterfaz(interfazDTO);
-
-
-            }
-              
-        }
-        
-            //una vez lo tenga serializado tengo que la traduccion EXTERNAL_COD --> MM_TRANSLATION  traducciendo por ejemplo street type
-            //insertar en las tablas maestras ya sea mm_customer...
-            //y una vez ejecutado la insercion actualizamos el statusprocess en la tabla interfaz con el valor P = procesado
-                break;
-
+            processCustomerAndInsertInMainTable(interfazRepository,interfazListWithStatusN,tr,codProv,date);
+            break;
             case Constants.PARTS:
-
-            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.PARTS);
-            PartsDTO parts=new PartsDTO();
-            PartsRepository partsRepository = new PartsRepository();
-            String id,codigoExterno,internalCod,descripcion,matricula,idInvoice,dniVehicle,dateNotification;
-            if (interfazListWithStatusN!=null) {
-                for (InterfazDTO interfazDTO : interfazListWithStatusN) {
-                    if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
-                    if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
-                    parts = new PartsDTO();
-    
-                    Map<String, String> partsData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
-                    //aqui traduciriamos los campos que fueran necesarios pero parts no necesita serlo.
-                     parts.setId(Utils.randomID()); //le generamos un id;
-                     parts.setCodigoExterno( partsData.get("codigoExterno"));
-                     parts.setInternalCod(partsData.get("internalCod"));
-                     parts.setDescripcion(partsData.get("descripcion"));
-                     parts.setMatricula(partsData.get("matricula"));
-                     parts.setIdInvoice(partsData.get("idInvoice"));
-                     parts.setDniVehicle(partsData.get("dniVehicle"));
-                     parts.setDateNotification(Utils.stringToSqlDate(partsData.get("dateNotification")));
-                    
-                    //insertamos en la tabla maestra
-                    partsRepository.insertPartsToMainTable(parts);
-    
-                    //actualizar estado interfaz a --> P
-                    interfazDTO.setStatusProcess(Constants.SP_P);
-                    //insertamos el nuevo json con los datos actualizados
-                    interfazDTO.setContJson(gson.toJson(parts));  
-                    //actualizamos el estado con el nuevo json
-                    interfazRepository.updateInterfaz(interfazDTO);
-                }
-            }
+            processPartAndInsertInMainTable(interfazRepository,interfazListWithStatusN,tr,codProv,date);
                 break;
-            
-            
-            
-            
             case Constants.VEHICLES:
-            interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.VEHICLES);
-            VehicleDTO vehicle= new VehicleDTO();
-             VehiclesRepository vehicleRepository = new VehiclesRepository();
-            if (interfazListWithStatusN!=null) {
-                for (InterfazDTO interfazDTO : interfazListWithStatusN) {
-                    if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
-                    if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
-    
-                    String colorTranslated,color;
-                    Map<String, String> vehicleData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
-
-                        vehicle.setId(Utils.randomID());
-                        vehicle.setMatricula(vehicleData.get("matricula"));
-                        vehicle.setTipoVehiculo(vehicleData.get("tipoVehiculo"));
-                        vehicle.setMarcaVehiculo(vehicleData.get("marcaVehiculo"));
-                        vehicle.setModelo(vehicleData.get("modelo"));
-                        color = vehicleData.get("color");
-                        //traducimos el color mediante la tabla auxiliar translation
-                        colorTranslated = tr.getTraductionByProvider(color,codProv);
-
-                        color = colorTranslated.equals(Errors.ERROR_TRADUCTION) ? color : colorTranslated;
-                        vehicle.setColor(color);
-                        vehicle.setDniUsuario(vehicleData.get("dniUsuario"));
-
-                    //guarda vehiculo en tabla maestra
-                    vehicleRepository.insertVehicleToMainTable(vehicle);
-                    //actualizar estado interfaz a --> P
-                    interfazDTO.setStatusProcess(Constants.SP_P);
-                    //insertamos el nuevo json con los datos actualizados
-                    interfazDTO.setContJson(gson.toJson(vehicle));  
-                    //actualizamos el estado con el nuevo json
-                    interfazRepository.updateInterfaz(interfazDTO);
-                }
-            }
+            processVehicleAndInsertInMainTable(interfazRepository, interfazListWithStatusN, tr, codProv, date);
                 break;
-
         }
-
-
-
-
     }
 
     @Override
@@ -301,9 +175,7 @@ public class ProccessServiceImpl implements ProccessService{
                     customerFile= PropertiesConfig.PATH + PropertiesConfig.CUSTOMER_PATH_FILE + codProvActivo +Constants.UNDERSCORE+ dateFile + PropertiesConfig.FORMAT_DAT;
                     vehicleFile= PropertiesConfig.PATH + PropertiesConfig.VEHICLE_PATH_FILE + codProvActivo +Constants.UNDERSCORE+ dateFile + PropertiesConfig.FORMAT_DAT;
                     partFile= PropertiesConfig.PATH + PropertiesConfig.PARTS_PATH_FILE + codProvActivo +Constants.UNDERSCORE+ dateFile + PropertiesConfig.FORMAT_DAT;
-                    
-                  
-                    //tienes que leer los 3 archivos
+                                      
                     switch (source) {
                         case Constants.CUSTOMER:
                         readFileAndInsertToInterfaz(customerFile,Constants.CUSTOMER, codProvActivo);
@@ -332,15 +204,12 @@ public class ProccessServiceImpl implements ProccessService{
                         source = PropertiesConfig.PARTS_PATH_FILE;
                         break;
                 }
-                //String source,String codProv, String date
+
                 String path= PropertiesConfig.PATH+ source +  codProv + underscore+dateFile + PropertiesConfig.FORMAT_DAT;
                 readFileAndInsertToInterfaz(path, source, codProv);
                }
                                         
-   
-
         } catch (Exception e) {
-           
             e.printStackTrace();
         }
     }
@@ -449,7 +318,62 @@ public class ProccessServiceImpl implements ProccessService{
 
 
 
+    private void processCustomerAndInsertInMainTable(InterfazRepository interfazRepository,List <InterfazDTO> interfazListWithStatusN,TranslationRepository tr,String codProv,String date ){
+         try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
 
+             //sacar una lista de la tabla MM_interfaz con los que tengan el status process en N
+             interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.CUSTOMER);
+             CustomerDTO customer= new CustomerDTO();
+             CustomerRepository customerRepository = new CustomerRepository();
+             String DNI,name,firstSurname,lastSurname,email,birthDate,postalCode,streetType,city,number,phone,gender,licenceType;
+             if (interfazListWithStatusN!=null) {
+             //serializar el objeto ya sea cutomer
+             for (InterfazDTO interfazDTO : interfazListWithStatusN) {
+                 if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
+                 if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
+ 
+                 Map<String, String> customerData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
+                  DNI = customerData.get("DNI");
+                  name = customerData.get("name");
+                  firstSurname = customerData.get("first_surname");
+                  lastSurname = customerData.get("last_surname");
+                  email = customerData.get("email");
+                  birthDate = customerData.get("birth_date");
+                  postalCode = customerData.get("postal_code");
+                  streetType = customerData.get("street_type");
+                  city = customerData.get("city");
+                  number = customerData.get("number");
+                  phone = customerData.get("phone");
+                  gender = customerData.get("gender");
+                  licenceType = customerData.get("licence_type");
+ 
+                 //traducimos a traves de la tabla translation dependiendo del proveedor
+                 if (!streetType.isEmpty()) { streetType = tr.getTraductionByProvider(streetType, codProv);}  
+                 if (!city.isEmpty()) { city = tr.getTraductionByProvider(city, codProv);}  
+                 if (!gender.isEmpty()) { gender = tr.getTraductionByProvider(gender, codProv);} 
+                 if (!licenceType.isEmpty()) { licenceType = tr.getTraductionByProvider(licenceType, codProv);} 
+ 
+                 customer = new CustomerDTO(DNI,name,firstSurname,lastSurname,email,birthDate,postalCode,streetType,city,number,phone,gender,licenceType); 
+                 customerRepository.insertCustomerToMainTable(customer);
+ 
+                 //actualizar estado interfaz a --> P
+                 interfazDTO.setStatusProcess(Constants.SP_P);
+                 
+                 //insertamos el nuevo json con los datos actualizados
+                 interfazDTO.setContJson(gson.toJson(customer));  
+                 //actualizamos el estado con el nuevo json
+                 interfazRepository.updateInterfaz(interfazDTO);
+ 
+ 
+             }
+               
+         }
+         } catch (Exception e) {
+            e.printStackTrace();
+         }
+         
+    } 
 
 ///////////////////////////////////////////////////////////////////     VEHICLE   ///////////////////////////////////////////////////////////////////////////////////
 
@@ -483,7 +407,48 @@ private boolean existJsonAndIsDifferentVehicle(VehicleDTO vehicleDTO,String codP
 
 }
 
+private void processVehicleAndInsertInMainTable(InterfazRepository interfazRepository,List <InterfazDTO> interfazListWithStatusN,TranslationRepository tr,String codProv,String date ){
+    try {
+    Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
+    interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.VEHICLES);
+    VehicleDTO vehicle= new VehicleDTO();
+     VehiclesRepository vehicleRepository = new VehiclesRepository();
+    if (interfazListWithStatusN!=null) {
+        for (InterfazDTO interfazDTO : interfazListWithStatusN) {
+            if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
+            if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
 
+            String colorTranslated,color;
+            Map<String, String> vehicleData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
+
+                vehicle.setId(Utils.randomID());
+                vehicle.setMatricula(vehicleData.get("matricula"));
+                vehicle.setTipoVehiculo(vehicleData.get("tipoVehiculo"));
+                vehicle.setMarcaVehiculo(vehicleData.get("marcaVehiculo"));
+                vehicle.setModelo(vehicleData.get("modelo"));
+                color = vehicleData.get("color");
+                //traducimos el color mediante la tabla auxiliar translation
+                colorTranslated = tr.getTraductionByProvider(color,codProv);
+
+                color = colorTranslated.equals(Errors.ERROR_TRADUCTION) ? color : colorTranslated;
+                vehicle.setColor(color);
+                vehicle.setDniUsuario(vehicleData.get("dniUsuario"));
+
+            //guarda vehiculo en tabla maestra
+            vehicleRepository.insertVehicleToMainTable(vehicle);
+            //actualizar estado interfaz a --> P
+            interfazDTO.setStatusProcess(Constants.SP_P);
+            //insertamos el nuevo json con los datos actualizados
+            interfazDTO.setContJson(gson.toJson(vehicle));  
+            //actualizamos el estado con el nuevo json
+            interfazRepository.updateInterfaz(interfazDTO);
+        }
+    }
+        
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
 ///////////////////////////////////////////////////////////////////     PARTS   ///////////////////////////////////////////////////////////////////////////////////
 
@@ -517,6 +482,47 @@ private boolean existJsonAndIsDifferentParts(PartsDTO partsDTO,String codProv){
 
 }
 
+
+private void processPartAndInsertInMainTable(InterfazRepository interfazRepository,List <InterfazDTO> interfazListWithStatusN,TranslationRepository tr,String codProv,String date ){
+    try {
+    Gson gson = new GsonBuilder().setPrettyPrinting().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
+    interfazListWithStatusN = interfazRepository.getRecordsWithStatusInN(Constants.PARTS);
+            PartsDTO parts=new PartsDTO();
+            PartsRepository partsRepository = new PartsRepository();
+            String id,codigoExterno,internalCod,descripcion,matricula,idInvoice,dniVehicle,dateNotification;
+            if (interfazListWithStatusN!=null) {
+                for (InterfazDTO interfazDTO : interfazListWithStatusN) {
+                    if (codProv==null) { codProv = interfazDTO.getCodProv();}//en caso de que no nos lo mande lo cogemos de interfaz
+                    if (date==null) {date = Utils.timeNow().toString();} //igual con la fecha
+                    parts = new PartsDTO();
+    
+                    Map<String, String> partsData = gson.fromJson(interfazDTO.getcontJson(), Map.class);
+                    //aqui traduciriamos los campos que fueran necesarios pero parts no necesita serlo.
+                     parts.setId(Utils.randomID()); //le generamos un id;
+                     parts.setCodigoExterno( partsData.get("codigoExterno"));
+                     parts.setInternalCod(partsData.get("internalCod"));
+                     parts.setDescripcion(partsData.get("descripcion"));
+                     parts.setMatricula(partsData.get("matricula"));
+                     parts.setIdInvoice(partsData.get("idInvoice"));
+                     parts.setDniVehicle(partsData.get("dniVehicle"));
+                     parts.setDateNotification(Utils.stringToSqlDate(partsData.get("dateNotification")));
+                    
+                    //insertamos en la tabla maestra
+                    partsRepository.insertPartsToMainTable(parts);
+    
+                    //actualizar estado interfaz a --> P
+                    interfazDTO.setStatusProcess(Constants.SP_P);
+                    //insertamos el nuevo json con los datos actualizados
+                    interfazDTO.setContJson(gson.toJson(parts));  
+                    //actualizamos el estado con el nuevo json
+                    interfazRepository.updateInterfaz(interfazDTO);
+                }
+            }
+            
+}catch(Exception e){
+        e.printStackTrace();
+    }
+}
 ///////////////////////////////////////////////////////////////////     GENERIC   ///////////////////////////////////////////////////////////////////////////////////
 
 
