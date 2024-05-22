@@ -52,18 +52,17 @@ public class ProccessServiceImpl implements ProccessService{
     public static void main(String[] args) {
         ProccessServiceImpl psi = new ProccessServiceImpl();
        
-        psi.readInfoFile(Constants.CUSTOMER,null,null);
-        psi.readInfoFile(Constants.VEHICLES,null,null);
+        // psi.readInfoFile(Constants.CUSTOMER,null,null);
+        // psi.readInfoFile(Constants.VEHICLES,null,null);
         psi.readInfoFile(Constants.PARTS,null,null);
-        psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
-        psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
-        psi.proccessIntegrateInfo(Constants.PARTS,null,null);
+        // psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
+        // psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
+        // psi.proccessIntegrateInfo(Constants.PARTS,null,null);
         // psi.voidGenerateInvoice("CAIX",null);
     
     }
 
 
-    //TERCER PROCESO 1 VEZ AL MES
     @Override
     public void voidGenerateInvoice(String codProv, String date) {
         try {
@@ -456,7 +455,7 @@ private void insertPartsToInterfaceTable(String[] splitData,InterfazRepository i
     try {
         PartsDTO partsDTO = new PartsDTO(splitData[0],splitData[1],splitData[2],splitData[3],splitData[4],splitData[5],splitData[6]);
         
-         if (!isInInterface(partsDTO.getId(),codprov)) {
+         if (!isInInterface(partsDTO.getCodigoExterno(),codprov)) {
          interfazRepository.insertPartToInterfaz(partsDTO,codprov,Constants.NEW);
          }else if(existJsonAndIsDifferentParts(partsDTO,codprov)){//en caso de ya exista un registo, mirara que el json no sea igual lo actualizara con OPERATION = "UPD" ->update
          interfazRepository.insertPartToInterfaz(partsDTO,codprov,Constants.UPD);//Cambiamos el operation a UPD

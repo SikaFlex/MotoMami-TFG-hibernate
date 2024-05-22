@@ -183,7 +183,7 @@ public void insertVehicleToInterfaz(VehicleDTO vehicleDTO,String codprov,String 
     String vehicleJson= gson.toJson(vehicleDTO);
     InterfazDTO interfazDTO = new InterfazDTO();
 
-    interfazDTO.setCodExternal(vehicleDTO.getMatricula());//CodExternal-DNI
+    interfazDTO.setCodExternal(vehicleDTO.getMatricula());//CodExternal
     interfazDTO.setCodProv(codprov);//CodProv-CodProv
     interfazDTO.setcontJson(vehicleJson);//contJson-objectJson
     interfazDTO.setCreateBy(PropertiesConfig.APP_NAME); //cratedBY -> NOMBRE DE LA APLICACION
