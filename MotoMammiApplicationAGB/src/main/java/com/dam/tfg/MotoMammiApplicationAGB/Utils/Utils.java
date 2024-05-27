@@ -37,7 +37,7 @@ public class Utils {
       return new Date(parsedDate.getTime());
     } catch (ParseException e) {
       e.printStackTrace();
-      return null;
+      return new Date(System.currentTimeMillis());
     }
   }
 

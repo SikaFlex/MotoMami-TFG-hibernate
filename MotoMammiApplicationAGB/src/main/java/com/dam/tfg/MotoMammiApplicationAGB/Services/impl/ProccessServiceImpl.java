@@ -49,18 +49,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProccessServiceImpl implements ProccessService{
  
-    public static void main(String[] args) {
-        ProccessServiceImpl psi = new ProccessServiceImpl();
-       
-        // psi.readInfoFile(Constants.CUSTOMER,null,null);
-        // psi.readInfoFile(Constants.VEHICLES,null,null);
-        psi.readInfoFile(Constants.PARTS,null,null);
-        // psi.proccessIntegrateInfo(Constants.CUSTOMER,null,null);
-        // psi.proccessIntegrateInfo(Constants.VEHICLES,null,null);
-        // psi.proccessIntegrateInfo(Constants.PARTS,null,null);
-        // psi.voidGenerateInvoice("CAIX",null);
-    
-    }
+  
 
 
     @Override
@@ -126,6 +115,8 @@ public class ProccessServiceImpl implements ProccessService{
       //SEGUNDO PROCESO
     @Override
     public void proccessIntegrateInfo(String source,String codProv, String date){
+        if (source==null) {System.err.println(Errors.ERROR_PROCES_FILE); return;}
+
         InterfazRepository interfazRepository = new InterfazRepository();
         List <InterfazDTO> interfazListWithStatusN=new ArrayList<InterfazDTO>();
         TranslationRepository tr = new TranslationRepository();
@@ -146,6 +137,7 @@ public class ProccessServiceImpl implements ProccessService{
     public void readInfoFile(String source,String codProv, String date){
         
         try {
+            if (source==null) {System.err.println(Errors.ERROR_SOURCE); return;}
             //en caso de que este vacio le pondra el dia de hoy
            String dateFile = date==null ? new SimpleDateFormat("yyyy-MM-dd").format(new Date())
                                         : new SimpleDateFormat("yyyy-MM-dd").format(date);
@@ -213,51 +205,6 @@ public class ProccessServiceImpl implements ProccessService{
         }
     }
     
-    private void readFileAndInsertToInterfaz(String pathCompost, String source,String codprov ){
-        try {
-            InterfazRepository interfazRepository = new InterfazRepository();
-            BufferedReader br = new BufferedReader(new FileReader(new File(pathCompost)));
-            String linea;
-            
-            while ((linea=br.readLine())!= null) {
-                /*
-                 * SE QUITA ESTE CONTROL DE ERRORES POR DECISION PERSONAL YA QUE ES UNA MINA DE BUGS Y COMO ALFINAL ESTO SE PUEDE ACORDAR CON EL CLIENTE
-                 * SE DECIDE QUE EL FORMATO SERA SIN LA FILA DE LAS COLUMNAS ARRIBA 
-                */
-                // if (linea.contains(source.SKIP_VEHICLE) || linea.contains(source.SKIP_CUSTOMER) || linea.contains(source.SKIP_PARTS) || linea == null){linea=br.readLine();}
-                String[] splitData =linea.split(","); 
-                
-    
-                switch (source) {
-
-
-                    case Constants.VEHICLES:
-                    insertVehicleToInterfaceTable(splitData,interfazRepository,codprov);
-                    break;
-               
-                    case Constants.PARTS:
-                    insertPartsToInterfaceTable(splitData,interfazRepository,codprov);
-                    break;
-                        
-                    case Constants.CUSTOMER:
-                    insertCustomerToInterfaceTable(splitData,interfazRepository,codprov);
-                    break;
-                   
-                }
-              
-            }
-            br.close();
-        
-        } catch (FileNotFoundException e) {
-            System.err.println(Errors.FILE_DONT_EXIST_ERROR + e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
 
 
@@ -266,10 +213,55 @@ public class ProccessServiceImpl implements ProccessService{
 
 
 ///////////////////////////////////////////////////////////////////     CUSTOMER   ///////////////////////////////////////////////////////////////////////////////////
+private void readFileAndInsertToInterfaz(String pathCompost, String source,String codprov ){
+    try {
+        InterfazRepository interfazRepository = new InterfazRepository();
+        BufferedReader br = new BufferedReader(new FileReader(new File(pathCompost)));
+        String linea;
+        
+        while ((linea=br.readLine())!= null) {
+            /*
+             * SE QUITA ESTE CONTROL DE ERRORES POR DECISION PERSONAL YA QUE ES UNA MINA DE BUGS Y COMO ALFINAL ESTO SE PUEDE ACORDAR CON EL CLIENTE
+             * SE DECIDE QUE EL FORMATO SERA SIN LA FILA DE LAS COLUMNAS ARRIBA 
+            */
+            // if (linea.contains(source.SKIP_VEHICLE) || linea.contains(source.SKIP_CUSTOMER) || linea.contains(source.SKIP_PARTS) || linea == null){linea=br.readLine();}
+            String[] splitData =linea.split(","); 
+            
+
+            switch (source) {
+
+
+                case Constants.VEHICLES:
+                insertVehicleToInterfaceTable(splitData,interfazRepository,codprov);
+                break;
+           
+                case Constants.PARTS:
+                insertPartsToInterfaceTable(splitData,interfazRepository,codprov);
+                break;
+                    
+                case Constants.CUSTOMER:
+                insertCustomerToInterfaceTable(splitData,interfazRepository,codprov);
+                break;
+               
+            }
+          
+        }
+        br.close();
+    
+    } catch (FileNotFoundException e) {
+        System.err.println(Errors.FILE_DONT_EXIST_ERROR + e.getMessage());
+        e.printStackTrace();
+    } catch (IOException e) {
+
+        e.printStackTrace();
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+}
 
 
 
-    private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
+private void insertCustomerToInterfaceTable(String[] splitData,InterfazRepository interfazRepository,String codprov){
     try {
         
         // java.sql.Date dateSql = Utils.stringToSqlDateSimpleFormat(splitData[5]);
@@ -523,9 +515,6 @@ private void processPartAndInsertInMainTable(InterfazRepository interfazReposito
     }
 }
 ///////////////////////////////////////////////////////////////////     GENERIC   ///////////////////////////////////////////////////////////////////////////////////
-
-
- 
 private boolean isInInterface(String externalCod,String codProv) {
     try {
     InterfazRepository IR = new InterfazRepository();
@@ -552,7 +541,8 @@ private void insertErrorMessage(Exception e){
         String errorMessage = e.getMessage()!= null ? e.getMessage() : Errors.UNKNOW_ERROR ; //-> valido que no me meta null
         session = HibernateUtil.getSession();
         InterfazDTO interfazDTO = new InterfazDTO();
-
+        
+        interfazDTO.setId(Utils.randomID());
         interfazDTO.setCreateDate(Utils.timeNow());
         interfazDTO.setStatusProcess(Constants.SP_E); //--> StatusProcess: E -> ERROR
         interfazDTO.setCodError(Errors.ERROR_HIBERNATE);//-> dentro del catch de hibernate este es el causante de todos nuestros males

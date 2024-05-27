@@ -108,10 +108,12 @@ public class InterfazRepository {
             //en caso de que sea nuevo lo guardas
             if (operation==Constants.NEW) {
 
-                interfazDTO.setId(Utils.randomID());
+                interfazDTO.setId(Utils.randomID());    
                 interfazDTO.setCreateDate(Utils.timeNow());
 
                 session.beginTransaction();
+          
+
                 session.save(interfazDTO);
                 session.getTransaction().commit();
                 session.close();
@@ -135,7 +137,7 @@ public class InterfazRepository {
             }
            
         } catch (Exception e) {
-           e.printStackTrace();
+          System.out.println(e.getMessage());
         }
     }
 
