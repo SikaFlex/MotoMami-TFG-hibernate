@@ -39,4 +39,5 @@ public class Constants {
     public final static String path = ".dat";
 
     public final static String SUCCESS_INFO_FILE = "Se ha realizado la lecutura correctamente";
+    public final static String SUCCESS_PROCESS_FILE = "Se ha realizado la inserccion a las tablas maestras correctamente";
 }

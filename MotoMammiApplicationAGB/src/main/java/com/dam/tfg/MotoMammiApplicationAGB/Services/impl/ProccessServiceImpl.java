@@ -116,19 +116,21 @@ public class ProccessServiceImpl implements ProccessService{
     @Override
     public void proccessIntegrateInfo(String source,String codProv, String date){
         if (source==null) {System.err.println(Errors.ERROR_PROCES_FILE); return;}
+        String dateFile = date==null ? new SimpleDateFormat("yyyy-MM-dd").format(new Date())
+                                     : new SimpleDateFormat("yyyy-MM-dd").format(date);
 
         InterfazRepository interfazRepository = new InterfazRepository();
         List <InterfazDTO> interfazListWithStatusN=new ArrayList<InterfazDTO>();
         TranslationRepository tr = new TranslationRepository();
         switch (source) {
             case Constants.CUSTOMER:
-            processCustomerAndInsertInMainTable(interfazRepository,interfazListWithStatusN,tr,codProv,date);
+            processCustomerAndInsertInMainTable(interfazRepository,interfazListWithStatusN,tr,codProv,dateFile);
             break;
             case Constants.PARTS:
-            processPartAndInsertInMainTable(interfazRepository,interfazListWithStatusN,tr,codProv,date);
+            processPartAndInsertInMainTable(interfazRepository,interfazListWithStatusN,tr,codProv,dateFile);
                 break;
             case Constants.VEHICLES:
-            processVehicleAndInsertInMainTable(interfazRepository, interfazListWithStatusN, tr, codProv, date);
+            processVehicleAndInsertInMainTable(interfazRepository, interfazListWithStatusN, tr, codProv, dateFile);
                 break;
         }
     }
