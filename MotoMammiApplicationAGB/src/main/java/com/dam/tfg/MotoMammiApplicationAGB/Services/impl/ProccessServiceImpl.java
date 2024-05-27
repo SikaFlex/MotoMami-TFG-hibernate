@@ -53,7 +53,7 @@ public class ProccessServiceImpl implements ProccessService{
 
 
     @Override
-    public void voidGenerateInvoice(String codProv, String date) {
+    public void voidGenerateInvoice(String source,String codProv, String date) {
         try {
             Date dateNow = new Date();                                                                      //en caso de que no mande nada buscara por el mes
             InvoiceRepository invoiceRepository = new InvoiceRepository();

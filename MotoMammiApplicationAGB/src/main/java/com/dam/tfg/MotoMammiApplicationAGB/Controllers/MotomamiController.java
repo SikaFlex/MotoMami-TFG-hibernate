@@ -20,15 +20,17 @@ public class MotomamiController{
     @Autowired
     ProccessServiceImpl pService;
 
+    @Autowired
+    ProccessServiceImpl pServiceProcess;
 
-    //ENUNCIADO RUTA:/MotoMammiAplicationAGB/v1/readInfoFileAGB/{resource}/{codprov}/{date}
-    
-    @RequestMapping(value =("/MotoMammiAplicationAGB/v1/readInfoFileAGB/{resource}/{codprovProcess}/{dateProcess}"),
+   
+                                 //READ INFO FILE
+    @RequestMapping(value =("/MotoMammiAplicationAGB/v1/readInfoFileAGB/{resource}/{codprov}/{date}"),
                     method = RequestMethod.GET,
                     produces = "application/json")
     String callProcessReadInfo(@PathVariable String resource,
-                               @PathVariable String codprovProcess,
-                               @PathVariable String dateProcess
+                               @PathVariable String codprov,
+                               @PathVariable String date
                                ){
         try{
             String lastResource;
@@ -48,8 +50,8 @@ public class MotomamiController{
                 lastResource=null;
                 break;
             }
-          if(!codprovProcess.equals("null") || codprovProcess.isEmpty()) {lastCodProv=codprovProcess;}
-          if(!dateProcess.equals("null") || dateProcess.isEmpty()){lastDate=dateProcess;}
+          if(!codprov.equals("null") || codprov.isEmpty()) {lastCodProv=codprov;}
+          if(!date.equals("null") || date.isEmpty()){lastDate=date;}
           
             pService.readInfoFile(lastResource,lastCodProv,lastDate);
             
@@ -62,11 +64,11 @@ public class MotomamiController{
         }
      }
 
-
-  @RequestMapping(value =("/MotoMammiAplicationAGB/v1/proccessIntegrateInfoAGB/{resourceProcess}/{codprov}/{date}"),
+                                    // PROCESS INTEGRATE INFO 
+  @RequestMapping(value =("/MotoMammiAplicationAGB/v1/proccessIntegrateInfoAGB/{resource}/{codprov}/{date}"),
                     method = RequestMethod.GET,
                     produces = "application/json")
-    String callProcessInfo(    @PathVariable String resourceProcess,
+    String callProcessInfo(    @PathVariable String resource,
                                @PathVariable String codprov,
                                @PathVariable String date
                                ){
@@ -75,7 +77,7 @@ public class MotomamiController{
             String lastResource;
             String lastCodProv=null;
             String lastDate=null;
-            switch (resourceProcess) {
+            switch (resource) {
                 case "customer":
                     lastResource= Constants.CUSTOMER;
                     break;
@@ -91,7 +93,7 @@ public class MotomamiController{
             }
           if(!codprov.equals("null") || codprov.isEmpty()) {lastCodProv=codprov;}
           if(!date.equals("null") || date.isEmpty()){lastDate=date;}
-          pService.proccessIntegrateInfo(lastResource,lastCodProv,lastDate);
+          pServiceProcess.proccessIntegrateInfo(lastResource,lastCodProv,lastDate);
           
           return Constants.SUCCESS_PROCESS_FILE;
 
@@ -101,7 +103,47 @@ public class MotomamiController{
         }
     }
 
+                                //INVOICE
+@RequestMapping(value = ("/MotoMammiAplicationAGB/v1/genInvoiceFileAGB/{resource}/{codprov}/{date}"), 
+                                        method = RequestMethod.GET, 
+                                        produces = "application/json")
+String callInvoiceGenerate(@PathVariable String resource,
+        @PathVariable String codprov,
+        @PathVariable String date) {
+    try {
+        String lastResource;
+        String lastCodProv = null;
+        String lastDate = null;
+        switch (resource) {
+            case "customer":
+                lastResource = Constants.CUSTOMER;
+                break;
+            case "vehicle":
+                lastResource = Constants.VEHICLES;
+                break;
+            case "parts":
+                lastResource = Constants.PARTS;
+                break;
+            default:
+                lastResource = null;
+                break;
+        }
+        if (!codprov.equals("null") || codprov.isEmpty()) {
+            lastCodProv = codprov;
+        }
+        if (!date.equals("null") || date.isEmpty()) {
+            lastDate = date;
+        }
 
+        pService.voidGenerateInvoice(lastResource, lastCodProv, lastDate);
+
+        return Constants.SUCCESS_INFO_FILE;
+
+    } catch (Exception e) {
+        System.err.println(Errors.ERROR_INFO_FILE + e.getMessage());
+        return Errors.ERROR_PROCES_FILE_CONTROLLER + e.getMessage();
+    }
+}
 
 
 
