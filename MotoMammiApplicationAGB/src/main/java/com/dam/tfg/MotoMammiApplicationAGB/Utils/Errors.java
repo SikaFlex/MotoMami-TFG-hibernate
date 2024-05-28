@@ -12,6 +12,7 @@ public class Errors {
     public final static String ERROR_INFO_FILE="SOURCE ES OBLIGATORIO DURANTE LA EJECUCION DE INFO FILE ERROR: ";
     public final static String ERROR_PROCES_FILE="SOURCE ES OBLIGATORIO DURANTE LA EJECUCION DE PROCESS INFO FILE ERROR: ";
     public final static String ERROR_PROCES_FILE_CONTROLLER= "SE HA PRODUCIDO UN ERROR DURANTE LA EJECUCION DE READ INFO FILE ";
+    public final static String ERROR_INVOICE_WITHOUT_CODPROV= "ERROR: El codigo de proveedor es obligatorio";
 
     
 }

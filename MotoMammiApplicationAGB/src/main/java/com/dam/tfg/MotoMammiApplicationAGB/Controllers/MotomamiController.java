@@ -20,9 +20,6 @@ public class MotomamiController{
     @Autowired
     ProccessServiceImpl pService;
 
-    @Autowired
-    ProccessServiceImpl pServiceProcess;
-
    
                                  //READ INFO FILE
     @RequestMapping(value =("/MotoMammiAplicationAGB/v1/readInfoFileAGB/{resource}/{codprov}/{date}"),
@@ -53,10 +50,9 @@ public class MotomamiController{
           if(!codprov.equals("null") || codprov.isEmpty()) {lastCodProv=codprov;}
           if(!date.equals("null") || date.isEmpty()){lastDate=date;}
           
-            pService.readInfoFile(lastResource,lastCodProv,lastDate);
-            
-            return Constants.SUCCESS_INFO_FILE;
-            
+          pService.readInfoFile(lastResource,lastCodProv,lastDate);
+          return Constants.SUCCESS_INFO_FILE;
+
 
         } catch (Exception e){
             System.err.println(Errors.ERROR_INFO_FILE + e.getMessage());
@@ -64,7 +60,7 @@ public class MotomamiController{
         }
      }
 
-                                    // PROCESS INTEGRATE INFO 
+    // PROCESS INTEGRATE INFO 
   @RequestMapping(value =("/MotoMammiAplicationAGB/v1/proccessIntegrateInfoAGB/{resource}/{codprov}/{date}"),
                     method = RequestMethod.GET,
                     produces = "application/json")
@@ -73,7 +69,6 @@ public class MotomamiController{
                                @PathVariable String date
                                ){
             try{
-            System.out.println("FUNCIONA?????????????????????????????????????????????");
             String lastResource;
             String lastCodProv=null;
             String lastDate=null;
@@ -93,7 +88,7 @@ public class MotomamiController{
             }
           if(!codprov.equals("null") || codprov.isEmpty()) {lastCodProv=codprov;}
           if(!date.equals("null") || date.isEmpty()){lastDate=date;}
-          pServiceProcess.proccessIntegrateInfo(lastResource,lastCodProv,lastDate);
+          pService.proccessIntegrateInfo(lastResource,lastCodProv,lastDate);
           
           return Constants.SUCCESS_PROCESS_FILE;
 
@@ -134,10 +129,12 @@ String callInvoiceGenerate(@PathVariable String resource,
         if (!date.equals("null") || date.isEmpty()) {
             lastDate = date;
         }
+        if (lastCodProv==null) {
+            return Errors.ERROR_INVOICE_WITHOUT_CODPROV;
+        }
+        pService.generateInvoice(lastCodProv, lastDate);
 
-        pService.voidGenerateInvoice(lastResource, lastCodProv, lastDate);
-
-        return Constants.SUCCESS_INFO_FILE;
+        return Constants.SUCCESS_INVOICE;
 
     } catch (Exception e) {
         System.err.println(Errors.ERROR_INFO_FILE + e.getMessage());

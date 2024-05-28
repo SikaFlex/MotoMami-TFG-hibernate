@@ -184,6 +184,10 @@ SET statusProcess = 'N';
 INSERT INTO mm_agb.mm_invoices (
     id, codProv, dni_Cliente, fecha_emision, nombreEmpresa, cifEmpresa, direccionEmpresa, coste, divisa, iva
 )
-VALUES (
-    '12', 'CAIX', '07178855S', '2024-05-20', 'pepinosRamon', '44444444B', 'C/ Gremi fuster 3 Sotano derecha', 300, '€', 21
-);
+VALUES 
+('1', 'CAIX', '07178855S', '2024-04-22', 'Electricas Angel S.L', '44444444B', 'C/ Gremi fuster 3 Sotano derecha', 363.0, 'euro', 21),
+('2', 'CAIX', '33333333B', '2024-04-22', 'Empresa SL', '99999999B', 'C/Calle ejemplo n2', 121.0, 'euro', 21),
+('3', 'CAIX', '44444444S', '2024-04-22', 'Empresa SL', '99999999B', 'C/Calle ejemplo n2', 242.0, 'euro', 21),
+('4', 'CAIX', '55555555T', '2024-04-22', 'Empresa SL', '88888888B', 'C/Calle ejemplo n2', 484.0, 'euro', 21),
+('5', 'CAIX', '69696969Z', '2024-04-22', 'Empresa SL', '66666666B', 'C/Calle ejemplo n2', 605.0, 'euro', 21);
+

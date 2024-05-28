@@ -1,4 +1,3 @@
-
 MOTOMAMI
 Descripción
 MOTOMAMI es una aplicación móvil diseñada para mujeres conductoras de diversos vehículos, incluyendo motos, coches, bicicletas, patinetes eléctricos y furgonetas. La aplicación permite registrar partes de accidente y contratar seguros específicos para conductoras a partir de los 16 años.
@@ -63,6 +62,9 @@ Despliegue en Producción
 Configura el entorno de producción en application.properties 
 Compila el proyecto con Maven.
 Despliega el archivo JAR generado en el servidor de producción.
+**El orden de ejecucion es el siguiente: Interfaz->Customer->Vehicles->Parts->Invoice 
+
+Cada una dependende de la otras, siendo el orden de ejecucion el siguiente ReadFile -> ProcessFile -> GenerateInvoice
 
 
 

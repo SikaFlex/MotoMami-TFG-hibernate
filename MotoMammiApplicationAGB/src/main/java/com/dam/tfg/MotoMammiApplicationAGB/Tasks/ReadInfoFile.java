@@ -15,21 +15,21 @@ public class ReadInfoFile {
 
 
   //LEER CADA DIA ARCHIVO DE CLIENTES
-  @Scheduled(cron = "${cron.task.customer}")
+  @Scheduled(cron = "${cron.task.read.customer}")
   public void readCustomerFile() {
     ProccessServiceImpl process = new ProccessServiceImpl();
     process.readInfoFile(Constants.CUSTOMER, null,null);
   }
 
   //LEER CADA DIA ARCHIVO DE PARTES DE LOS CLIENTES
-  @Scheduled(cron = "${cron.task.parts}")
+  @Scheduled(cron = "${cron.task.read.parts}")
   public void readPartFile() {
     ProccessServiceImpl process = new ProccessServiceImpl();
     process.readInfoFile(Constants.PARTS, null,null);
   }
 
 //LEER CADA DIA ARCHIVO DE LOS VEHICULOS DE LOS CLIENTES
-  @Scheduled(cron = "${cron.task.vehicles}")
+  @Scheduled(cron = "${cron.task.read.vehicles}")
   public void readVehiclesFile() {
     ProccessServiceImpl process = new ProccessServiceImpl();
     process.readInfoFile(Constants.VEHICLES, null,null);
