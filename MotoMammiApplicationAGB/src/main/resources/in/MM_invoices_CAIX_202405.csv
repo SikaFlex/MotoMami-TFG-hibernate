@@ -1,0 +1,7 @@
+DNI,codProv,fecha_emision,nombre,firt_Surname,last_Surname,tipoDeVehiculo,matricula,nombreEmpresa,cifEmpresa,direccion,coste,divisa,iva
+07178855S,CAIX,2024-04-29,Angel,Garcia,Botia,Coche,ABC1234,Electricas Angel S.L,44444444B,C/ Gremi fuster 3 Sotano derecha,439.23,euro,21
+07178855S,CAIX,2024-04-29,Angel,Garcia,Botia,Coche,ABC1234,pepinosRamon,44444444B,C/ Gremi fuster 3 Sotano derecha,363.0,euro,21
+33333333B,CAIX,2024-04-29,Pepe,Viyuela,Sainz,SUV,PQR2345,Empresa SL,99999999B,C/Calle ejemplo n2,146.41,euro,21
+44444444S,CAIX,2024-04-29,Vicente,Fernandez,Tejero,Camión,LMN9101,Empresa SL,99999999B,C/Calle ejemplo n2,292.82,euro,21
+55555555T,CAIX,2024-04-29,Miguel Angel,Sanchez,Piñedo,Motocicleta,XYZ5678,Empresa SL,88888888B,C/Calle ejemplo n2,585.64,euro,21
+69696969Z,CAIX,2024-04-29,Juana,EDITADO,Anton,EDITADOO,STU6789,Empresa SL,66666666B,C/Calle ejemplo n2,732.05,euro,21

@@ -88,13 +88,16 @@ public class MotomamiController{
             }
           if(!codprov.equals("null") || codprov.isEmpty()) {lastCodProv=codprov;}
           if(!date.equals("null") || date.isEmpty()){lastDate=date;}
+          
+          if (lastResource.equals(null)) {return Errors.ERROR_PROCES_FILE_CONTROLLER;}
+          
           pService.proccessIntegrateInfo(lastResource,lastCodProv,lastDate);
           
           return Constants.SUCCESS_PROCESS_FILE;
 
         } catch (Exception e){
             System.err.println(Errors.ERROR_INFO_FILE + e.getMessage());
-            return Errors.ERROR_PROCES_FILE_CONTROLLER + e.getMessage();
+            return Errors.ERROR_PROCES_FILE_CONTROLLER;
         }
     }
 
